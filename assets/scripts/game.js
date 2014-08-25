@@ -1,119 +1,121 @@
 window.onload = function() {
-    var game = new Phaser.Game(1280, 720, Phaser.AUTO, 'game', { preload: preload, create: create, update: update, render: render });
+    var game = new Phaser.Game(1280, 720, Phaser.AUTO, 'game');
 
-    function preload () {
-        game.load.image('char', 'assets/char.png');
-        game.load.image('charmf', 'assets/charmf.png');
-        game.load.image('block', 'assets/block.png');
-        game.load.image('barrel', 'assets/barrel.png');
-        game.load.image('bg', 'assets/background objects/background.png');
-        game.load.image('pine', 'assets/background objects/pinetree.png');
-        game.load.image('tileset', 'assets/tilset.png');
-        game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-    }
+    var HecarimGame = {
+        gameover: false,
+        preload: function() {
+            game.load.image('player', 'assets/char.png');
+            game.load.image('bg', 'assets/background objects/background.png');
+            game.load.image('pine', 'assets/background objects/pinetree.png');
+            game.load.image('tileset', 'assets/tilset.png');
+            game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
+        },
+        create: function() {
+            //set gameover to false
+            game.paused = false;
+            this.gameover = false;
+            //start Arcade Physics system
+            game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    var player;
-    var facing = 'left';
-    var jumpTimer = 0;
-    var cursors;
-    var jumpButton;
-    var crtlbtn;
-    var bg;
-    var map;
-    var layer;
+            //add background to stage
+            this.bg = game.add.tileSprite(0, 0, this.game.width, this.game.height, 'bg');
+            //fix background to camera
+            this.bg.fixedToCamera = true;
 
-    function create() {
+            //set gravity
+            game.physics.arcade.gravity.y = 1000;
 
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+            //load tilemap
+            this.map = game.add.tilemap('map');
+            //set tileset images
+            this.map.addTilesetImage('tileset', 'tileset');
+            this.map.addTilesetImage('pinetree', 'pine');
 
-        bg = game.add.tileSprite(0, 0, game.width, game.height, 'bg');
-        bg.fixedToCamera = true;
+            //create objects
+            this.map.createFromObjects('pines', 3, 'pine');
 
-        game.physics.arcade.gravity.y = 400;
+            //create tile layer
+            this.layer = this.map.createLayer('layer1');
 
-        /*for(var i = 0; i<1000; i++) {
-            var sprite = game.add.sprite(game.rnd.realInRange(0, game.width - 168), game.rnd.realInRange(0, game.height - 280), 'pine');
-            scale = game.rnd.realInRange(0.5, 1.5);
-            sprite.scale.x = scale;
-            sprite.scale.y = scale;
-        }*/
+            //add collision to every tile
+            this.map.setCollisionByExclusion([]);
 
-        map = game.add.tilemap('map');
-        map.addTilesetImage('tileset', 'tileset');
-        map.addTilesetImage('pinetree', 'pine');
+            //resize layer to world size
+            this.layer.resizeWorld();
 
-        map.createFromObjects('pines', 3, 'pine');
+            //add a player
+            this.player = game.add.sprite(80, game.world.centerY, 'player');
+            //enable physics for player
+            game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
-        layer = map.createLayer('layer1');
+            //collide to world bounds
+            this.player.body.collideWorldBounds = false;
 
-        map.setCollisionByExclusion([]);
+            //set hitbox size
+            this.player.body.setSize(60, 71, 15, 15);
 
-        layer.resizeWorld();
+            //anchor player to center
+            this.player.anchor.set(0.5);
 
-        player = game.add.sprite(110, 96, 'char');
-        game.physics.enable(player, Phaser.Physics.ARCADE);
+            //move player forward
+            this.player.body.velocity.x = 300;
 
-        player.body.bounce.y = 0.1;
-        player.body.collideWorldBounds = true;
-        player.body.setSize(60, 71, 15, 15);
+            //set camera to follow player
+            game.camera.follow(this.player);
 
-        player.anchor.set(0.5);
+            //listen for keys
+            this.crtlbtn = game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
+            this.jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        },
+        update: function() {
+            //handle collision
+            game.physics.arcade.collide(this.player, this.layer, function() {
+                HecarimGame.collision();
+            });
+            game.physics.arcade.collide(this.player, game.world, function() {
+                console.log('collide');
+            });
 
-        game.camera.follow(player, Phaser.Camera.FOLLOW_PLATFORMER);
-
-
-        cursors = game.input.keyboard.createCursorKeys();
-        crtlbtn = game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
-        jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
-    }
-
-    function update() {
-        game.physics.arcade.collide(player, layer);
-
-        player.body.velocity.x = 0;
-
-        /*if (cursors.up.isDown)
-        {
-            player.body.velocity.y = -200;
-        }
-        else if (cursors.down.isDown)
-        {
-            player.body.velocity.y = 200;
-        }*/
-
-        if (cursors.left.isDown)
-        {
-            if(crtlbtn.isDown) {
-                player.body.velocity.x = -700;
-            } else {
-                player.body.velocity.x = -200;
+            //controls
+            if(game.input.activePointer.isDown || this.jumpButton.isDown) {
+                if(HecarimGame.gameover) {
+                    game.state.start('game_hecarim');
+                } else {
+                    this.player.body.velocity.y = -200;
+                }
             }
-            player.scale.x = -1;
-        }
-        if (cursors.right.isDown)
-        {
-            if(crtlbtn.isDown) {
-                player.body.velocity.x = 700;
-            } else {
-                player.body.velocity.x = 200;
+
+            //level complete
+            if(game.world.width < this.player.x) {
+                this.level_complete();
             }
-            player.scale.x = 1;
+        },
+        render: function() {
+
+        },
+        collision: function() {
+            var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
+            var text = game.add.text(game.width/2, game.height/2, "Game Over\nClick to try again", style);
+            text.fixedToCamera = true;
+            text.anchor.set(0.5);
+
+            this.player.body.velocity.x = 0;
+            this.gameover = true;
+        },
+        level_complete: function() {
+            var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
+            var text = game.add.text(game.width/2, game.height/2, "Congratulations\nYou finished the level\nClick to try again", style);
+            text.fixedToCamera = true;
+            text.anchor.set(0.5);
+
+            this.player.body.velocity.x = 0;
+            this.player.destroy();
+            this.gameover = true;
         }
+    };
 
+    game.state.add('game_hecarim', HecarimGame);
 
-        if (jumpButton.isDown && player.body.onFloor())
-        {
-            player.body.velocity.y = -400;
-        }
-
-    }
-
-    function render () {
-        /*game.debug.text(game.time.physicsElapsed, 32, 32);
-        game.debug.body(player);
-        game.debug.bodyInfo(player, 16, 24);
-*/
-    }
+    game.state.start('game_hecarim');
 
 };
