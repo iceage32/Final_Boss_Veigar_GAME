@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/heca_run_fixed_ultimate.png', 430, 295, 12);
+            game.load.spritesheet('player', 'assets/heca.png', 430, 295, 18);
         },
         create: function() {
             //Enable advanced timing
@@ -24,7 +24,7 @@ window.onload = function() {
             //add background to stage
             var myBitmap = game.add.bitmapData(game.width, game.height);
 
-            var grd = myBitmap.context.createLinearGradient(0,0,0,600);
+            var grd = myBitmap.context.createLinearGradient(0,0,0,game.height);
             grd.addColorStop(0,"#232357");
             grd.addColorStop(1,"#8d70e6");
             myBitmap.context.fillStyle = grd;
@@ -50,7 +50,7 @@ window.onload = function() {
             this.layer = this.map.createLayer('layer1');
 
             //add collision to every tile
-            this.map.setCollisionByExclusion([]);
+            this.map.setCollisionByExclusion([0]);
 
             //resize layer to world size
             this.layer.resizeWorld();
@@ -59,7 +59,7 @@ window.onload = function() {
             this.player = game.add.sprite(80, game.world.centerY, 'player');
             //add animations
             this.player.animations.add('run', [0,1,2,3,4,5,6,7,8,9,10,11], 16, true);
-            this.player.animations.add('idle', [11]);
+            this.player.animations.add('idle', [12, 13, 14, 15, 16, 17], 4, true);
             this.player.animations.play('idle');
             //enable physics for player
             game.physics.enable(this.player, Phaser.Physics.ARCADE);
@@ -115,7 +115,7 @@ window.onload = function() {
             if(this.cursors.left.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = -400;
-                    this.player.animations.play('run', 60);
+                    this.player.animations.play('run');
                 } else {
                     this.player.body.velocity.x = -250;
                     this.player.animations.play('run');
@@ -125,7 +125,7 @@ window.onload = function() {
             } else if(this.cursors.right.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = 400;
-                    this.player.animations.play('run', 60);
+                    this.player.animations.play('run');
                 } else {
                     this.player.body.velocity.x = 250;
                     this.player.animations.play('run');
@@ -166,8 +166,82 @@ window.onload = function() {
         }
     };
 
-    game.state.add('game_hecarim', HecarimGame);
+    var SonaGame = {
+        preload: function() {
 
-    game.state.start('game_hecarim');
+        },
+        create: function() {
+            var text = game.add.text(game.width/2, game.height/2, "Sona Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
+        },
+        update: function() {
+
+        },
+        render: function() {
+
+        }
+    };
+
+    var MissFortuneGame = {
+        preload: function() {
+
+        },
+        create: function() {
+            var text = game.add.text(game.width/2, game.height/2, "Miss Fortune Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
+        },
+        update: function() {
+
+        },
+        render: function() {
+
+        }
+    };
+
+    var MainMenu = {
+        preload: function() {
+            game.load.spritesheet('button', 'assets/btn_sprite.png', 256, 96);
+        },
+        create: function() {
+            game.stage.backgroundColor = '#182d3b';
+            var text = game.add.text(game.width/2, game.height/4, "Final Boss Veigar Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
+
+            var buttons = game.add.group();
+
+            var firstbuttonX = (game.width - (256+10)*3)/2;
+            var buttonY = ((game.height/4)*3)-48;
+
+            var hecarimbutton = game.add.button(firstbuttonX, buttonY, 'button', function() {
+                game.state.start('game_hecarim');
+            }, this, 1, 0, 2, 0);
+            //hecarimbutton.anchor.set(0.5);
+            var missfortunebutton = game.add.button(firstbuttonX + 256 + 10, buttonY, 'button', function() {
+                game.state.start('game_missfortune');
+            }, this, 1, 0, 2, 0);
+            //missfortunebutton.anchor.set(0.5);
+            var sonabutton = game.add.button(firstbuttonX + (256 + 10)*2, buttonY, 'button', function() {
+                game.state.start('game_sona');
+            }, this, 1, 0, 2, 0);
+            //sonabutton.anchor.set(0.5);
+
+            buttons.add(hecarimbutton);
+            buttons.add(missfortunebutton);
+            buttons.add(sonabutton);
+        },
+        update: function() {
+
+        },
+        render: function() {
+
+        }
+    };
+
+    game.state.add('game_hecarim', HecarimGame);
+    game.state.add('game_missfortune', MissFortuneGame);
+    game.state.add('game_sona', SonaGame);
+    game.state.add('mainmenu', MainMenu);
+
+    game.state.start('mainmenu');
 
 };
