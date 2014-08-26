@@ -4,11 +4,12 @@ window.onload = function() {
     var HecarimGame = {
         gameover: false,
         preload: function() {
-            game.load.image('player', 'assets/char.png');
+            //game.load.image('player', 'assets/char.png');
             game.load.image('bg', 'assets/background objects/background.png');
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
+            game.load.spritesheet('player', 'assets/hecarim_run.png', 200, 190, 12);
         },
         create: function() {
             //Enable advanced timing
@@ -56,6 +57,8 @@ window.onload = function() {
 
             //add a player
             this.player = game.add.sprite(80, game.world.centerY, 'player');
+            this.player.animations.add('run');
+            this.player.animations.play('run', 20, true);
             //enable physics for player
             game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
@@ -63,7 +66,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(64, 64, 16, 16);
+            this.player.body.setSize(200, 190, 0, 0);
 
             //anchor player to center
             this.player.anchor.set(0.5);
