@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/hecarim_run.png', 200, 190, 12);
+            game.load.spritesheet('player', 'assets/hekkurim.png', 430, 295, 12);
         },
         create: function() {
             //Enable advanced timing
@@ -57,8 +57,10 @@ window.onload = function() {
 
             //add a player
             this.player = game.add.sprite(80, game.world.centerY, 'player');
-            this.player.animations.add('run');
-            this.player.animations.play('run', 20, true);
+            //add animations
+            this.player.animations.add('run', [0,1,2,3,4,5,6,7,8,9,10,11], 16, true);
+            this.player.animations.add('idle', [11]);
+            this.player.animations.play('idle');
             //enable physics for player
             game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
@@ -66,8 +68,8 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(200, 190, 0, 0);
-
+            //this.player.body.setSize(64, 128, -5, 32);
+            this.player.body.setSize(430, 295, 0, 0);
             //anchor player to center
             this.player.anchor.set(0.5);
 
@@ -113,17 +115,24 @@ window.onload = function() {
             if(this.cursors.left.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = -400;
+                    this.player.animations.play('run', 60);
                 } else {
                     this.player.body.velocity.x = -250;
+                    this.player.animations.play('run');
                 }
+                this.player.animations.play('run');
                 this.player.scale.x = -1;
             } else if(this.cursors.right.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = 400;
+                    this.player.animations.play('run', 60);
                 } else {
                     this.player.body.velocity.x = 250;
+                    this.player.animations.play('run');
                 }
                 this.player.scale.x = 1;
+            } else {
+                this.player.animations.play('idle');
             }
 
             //level complete
@@ -135,7 +144,7 @@ window.onload = function() {
             this.fpsText.text = game.time.fps + ' FPS';
         },
         render: function() {
-
+            //game.debug.body(this.player);
         },
         collision: function() {
             var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
