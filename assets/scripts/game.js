@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/hekkurim.png', 430, 295, 12);
+            game.load.spritesheet('player', 'assets/heca_run_fixed_ultimate.png', 430, 295, 12);
         },
         create: function() {
             //Enable advanced timing
