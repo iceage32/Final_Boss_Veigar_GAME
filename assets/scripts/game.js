@@ -11,6 +11,8 @@ window.onload = function() {
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
         },
         create: function() {
+            //Enable advanced timing
+            game.time.advancedTiming = true;
             //set gameover to false
             this.gameover = false;
             //set jump timer to 0
@@ -19,7 +21,15 @@ window.onload = function() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
             //add background to stage
-            this.bg = game.add.tileSprite(0, 0, game.width, game.height, 'bg');
+            var myBitmap = game.add.bitmapData(game.width, game.height);
+
+            var grd = myBitmap.context.createLinearGradient(0,0,0,600);
+            grd.addColorStop(0,"#232357");
+            grd.addColorStop(1,"#8d70e6");
+            myBitmap.context.fillStyle = grd;
+            myBitmap.context.fillRect(0,0,game.width,game.height);
+
+            this.bg = game.add.tileSprite(0, 0, game.width, game.height, myBitmap);
             //fix background to camera
             this.bg.fixedToCamera = true;
 
@@ -53,30 +63,44 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(60, 71, 15, 15);
+            this.player.body.setSize(64, 64, 16, 16);
 
             //anchor player to center
             this.player.anchor.set(0.5);
 
             this.player.body.gravity.y = 1000;
 
+            //Add drag to player
+            //this.player.body.drag.set(450);
+
             //set camera to follow player
             game.camera.follow(this.player);
+
+            //add fps counter
+            this.fpsText= game.add.text(5, 5, "0 FPS", { font: "28px Arial", fill: "#ffffff"});
+            this.fpsText.fixedToCamera = true;
 
             //listen for keys
             this.crtlbtn = game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
             this.jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             this.cursors = game.input.keyboard.createCursorKeys();
+
+            //handle collision
+            game.physics.arcade.collide(this.player, this.layer, function(e) {
+                //HecarimGame.collision();
+            }, null, this);
         },
         update: function() {
             //handle collision
             game.physics.arcade.collide(this.player, this.layer, function(e) {
                 //HecarimGame.collision();
-            });
+            }, null, this);
+
+            //reset player velocity
+            this.player.body.velocity.x = 0;
 
             //controls
-            this.player.body.velocity.x = 0;
-            if((game.input.activePointer.isDown || this.jumpButton.isDown)) {
+            if((game.input.activePointer.isDown || this.jumpButton.isDown || this.cursors.up.isDown)) {
                 if(HecarimGame.gameover) {
                     game.state.start('game_hecarim');
                 } else if(this.player.body.onFloor()) {
@@ -84,10 +108,18 @@ window.onload = function() {
                 }
             }
             if(this.cursors.left.isDown) {
-                this.player.body.velocity.x = -250;
+                if(this.crtlbtn.isDown) {
+                    this.player.body.velocity.x = -400;
+                } else {
+                    this.player.body.velocity.x = -250;
+                }
                 this.player.scale.x = -1;
             } else if(this.cursors.right.isDown) {
-                this.player.body.velocity.x = 250;
+                if(this.crtlbtn.isDown) {
+                    this.player.body.velocity.x = 400;
+                } else {
+                    this.player.body.velocity.x = 250;
+                }
                 this.player.scale.x = 1;
             }
 
@@ -95,6 +127,9 @@ window.onload = function() {
             if(game.world.width < this.player.x || game.world.height < this.player.y) {
                 this.level_complete();
             }
+
+            //set fps
+            this.fpsText.text = game.time.fps + ' FPS';
         },
         render: function() {
 
@@ -109,8 +144,7 @@ window.onload = function() {
             this.gameover = true;
         },
         level_complete: function() {
-            var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
-            var text = game.add.text(game.width/2, game.height/2, "Congratulations\nYou finished the level\nClick to try again", style);
+            var text = game.add.text(game.width/2, game.height/2, "Congratulations\nYou finished the level\nClick to try again", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.fixedToCamera = true;
             text.anchor.set(0.5);
 
