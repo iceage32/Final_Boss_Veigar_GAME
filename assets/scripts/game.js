@@ -1,5 +1,5 @@
 window.onload = function() {
-    var game = new Phaser.Game(1280, 720, Phaser.AUTO, 'game');
+    var game = new Phaser.Game(1280, 720, Phaser.CANVAS, 'game');
 
     var HecarimGame = {
         gameover: false,
@@ -12,27 +12,28 @@ window.onload = function() {
         },
         create: function() {
             //set gameover to false
-            game.paused = false;
             this.gameover = false;
+            //set jump timer to 0
+            this.jumpTimer = 0;
             //start Arcade Physics system
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
             //add background to stage
-            this.bg = game.add.tileSprite(0, 0, this.game.width, this.game.height, 'bg');
+            this.bg = game.add.tileSprite(0, 0, game.width, game.height, 'bg');
             //fix background to camera
             this.bg.fixedToCamera = true;
 
             //set gravity
-            game.physics.arcade.gravity.y = 1000;
+            game.physics.arcade.gravity.y = 300;
 
             //load tilemap
             this.map = game.add.tilemap('map');
             //set tileset images
-            this.map.addTilesetImage('tileset', 'tileset');
+            this.map.addTilesetImage('tilset', 'tileset');
             this.map.addTilesetImage('pinetree', 'pine');
 
             //create objects
-            this.map.createFromObjects('pines', 3, 'pine');
+            this.map.createFromObjects('pines', 1, 'pine');
 
             //create tile layer
             this.layer = this.map.createLayer('layer1');
@@ -57,8 +58,7 @@ window.onload = function() {
             //anchor player to center
             this.player.anchor.set(0.5);
 
-            //move player forward
-            this.player.body.velocity.x = 300;
+            this.player.body.gravity.y = 1000;
 
             //set camera to follow player
             game.camera.follow(this.player);
@@ -66,27 +66,33 @@ window.onload = function() {
             //listen for keys
             this.crtlbtn = game.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
             this.jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            this.cursors = game.input.keyboard.createCursorKeys();
         },
         update: function() {
             //handle collision
-            game.physics.arcade.collide(this.player, this.layer, function() {
-                HecarimGame.collision();
-            });
-            game.physics.arcade.collide(this.player, game.world, function() {
-                console.log('collide');
+            game.physics.arcade.collide(this.player, this.layer, function(e) {
+                //HecarimGame.collision();
             });
 
             //controls
-            if(game.input.activePointer.isDown || this.jumpButton.isDown) {
+            this.player.body.velocity.x = 0;
+            if((game.input.activePointer.isDown || this.jumpButton.isDown)) {
                 if(HecarimGame.gameover) {
                     game.state.start('game_hecarim');
-                } else {
-                    this.player.body.velocity.y = -200;
+                } else if(this.player.body.onFloor()) {
+                    this.player.body.velocity.y = -600;
                 }
+            }
+            if(this.cursors.left.isDown) {
+                this.player.body.velocity.x = -250;
+                this.player.scale.x = -1;
+            } else if(this.cursors.right.isDown) {
+                this.player.body.velocity.x = 250;
+                this.player.scale.x = 1;
             }
 
             //level complete
-            if(game.world.width < this.player.x) {
+            if(game.world.width < this.player.x || game.world.height < this.player.y) {
                 this.level_complete();
             }
         },
