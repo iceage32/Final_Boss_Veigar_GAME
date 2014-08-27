@@ -327,6 +327,7 @@ window.onload = function() {
                     SonaGame.score += Math.round(50-Math.abs(hitbox.y - button.y));
                     button.kill();
                 } else if(button.y > hitbox.y+50){
+                    SonaGame.score -= 50;
                     button.kill();
                 }
             }, null, this);
