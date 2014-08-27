@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/idle_and_running.png', 262, 180, 18);
+            game.load.spritesheet('player', 'assets/idle_6_run_12.png', 262, 180, 18);
         },
         create: function() {
             //Enable advanced timing
@@ -68,7 +68,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(64, 128, -6, 0);
+            this.player.body.setSize(64, 180, -6, 0);
             //anchor player to center
             this.player.anchor.set(0.5);
 
@@ -184,11 +184,21 @@ window.onload = function() {
 
     var SonaGame = {
         preload: function() {
-
+            game.load.spritesheet('button_q', 'assets/sona/button_q.png', 250, 250, 2);
+            game.load.spritesheet('button_w', 'assets/sona/button_w.png', 250, 250, 2);
+            game.load.spritesheet('button_e', 'assets/sona/button_e.png', 250, 250, 2);
+            game.load.spritesheet('button_r', 'assets/sona/button_r.png', 250, 250, 2);
         },
         create: function() {
             var text = game.add.text(game.width/2, 50, "Sona Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
+
+            this.buttons = game.add.group();
+
+            this.buttonq = game.add.sprite(0, 512, 'button_q');
+            this.buttonq.animations.add('pressed', [1]);
+            this.buttonq.animations.add('normal', [0]);
+
         },
         update: function() {
 
