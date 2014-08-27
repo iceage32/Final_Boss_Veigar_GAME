@@ -44,7 +44,7 @@ window.onload = function() {
             this.map.addTilesetImage('pinetree', 'pine');
 
             //create objects
-            this.map.createFromObjects('pines', 1, 'pine');
+            //this.map.createFromObjects('pines', 1, 'pine');
 
             //create tile layer
             this.layer = this.map.createLayer('layer1');
@@ -165,12 +165,12 @@ window.onload = function() {
         }
     };
 
-    var SonaGame = {
+    var MissFortuneGame = {
         preload: function() {
 
         },
         create: function() {
-            var text = game.add.text(game.width/2, game.height/2, "Sona Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            var text = game.add.text(game.width/2, game.height/2, "Miss Fortune Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
         },
         update: function() {
@@ -181,12 +181,13 @@ window.onload = function() {
         }
     };
 
-    var MissFortuneGame = {
+
+    var SonaGame = {
         preload: function() {
 
         },
         create: function() {
-            var text = game.add.text(game.width/2, game.height/2, "Miss Fortune Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            var text = game.add.text(game.width/2, 50, "Sona Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
         },
         update: function() {
@@ -241,6 +242,6 @@ window.onload = function() {
     game.state.add('game_sona', SonaGame);
     game.state.add('mainmenu', MainMenu);
 
-    game.state.start('game_hecarim');
+    game.state.start('mainmenu');
 
 };
