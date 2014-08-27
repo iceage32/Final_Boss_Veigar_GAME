@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/heca.png', 430, 295, 18);
+            game.load.spritesheet('player', 'assets/heca_run_idle_blurred.png', 430, 295, 18);
         },
         create: function() {
             //Enable advanced timing
@@ -56,7 +56,7 @@ window.onload = function() {
             this.layer.resizeWorld();
 
             //add a player
-            this.player = game.add.sprite(80, game.world.centerY, 'player');
+            this.player = game.add.sprite(80, game.world.height-512, 'player');
             //add animations
             this.player.animations.add('run', [0,1,2,3,4,5,6,7,8,9,10,11], 16, true);
             this.player.animations.add('idle', [12, 13, 14, 15, 16, 17], 4, true);
@@ -68,8 +68,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            //this.player.body.setSize(64, 128, -5, 32);
-            this.player.body.setSize(430, 295, 0, 0);
+            this.player.body.setSize(430, 295, -6, 0);
             //anchor player to center
             this.player.anchor.set(0.5);
 
@@ -144,7 +143,7 @@ window.onload = function() {
             this.fpsText.text = game.time.fps + ' FPS';
         },
         render: function() {
-            //game.debug.body(this.player);
+            game.debug.body(this.player);
         },
         collision: function() {
             var style = { font: "65px Arial", fill: "#ffffff", align: "center" };
@@ -242,6 +241,6 @@ window.onload = function() {
     game.state.add('game_sona', SonaGame);
     game.state.add('mainmenu', MainMenu);
 
-    game.state.start('mainmenu');
+    game.state.start('game_hecarim');
 
 };
