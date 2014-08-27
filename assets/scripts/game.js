@@ -183,27 +183,181 @@ window.onload = function() {
 
 
     var SonaGame = {
+        'buttonDown': {
+            'q': false,
+            'w': false,
+            'e': false,
+            'r': false
+        },
+        nextButtonSpawn: 0,
         preload: function() {
-            game.load.spritesheet('button_q', 'assets/sona/button_q.png', 250, 250, 2);
-            game.load.spritesheet('button_w', 'assets/sona/button_w.png', 250, 250, 2);
-            game.load.spritesheet('button_e', 'assets/sona/button_e.png', 250, 250, 2);
-            game.load.spritesheet('button_r', 'assets/sona/button_r.png', 250, 250, 2);
+            game.load.spritesheet('button_q', 'assets/sona/button_q.png', 100, 100, 2);
+            game.load.spritesheet('button_w', 'assets/sona/button_w.png', 100, 100, 2);
+            game.load.spritesheet('button_e', 'assets/sona/button_e.png', 100, 100, 2);
+            game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
+            game.load.image('hitline', 'assets/sona/hitline.png');
+            game.load.image('item', 'assets/sona/item.png');
         },
         create: function() {
-            var text = game.add.text(game.width/2, 50, "Sona Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
-            text.anchor.set(0.5);
+            //init arcade physics
+            game.physics.startSystem(Phaser.Physics.ARCADE);
 
-            this.buttons = game.add.group();
+            //add score
+            this.scoreText = game.add.text(0, 0, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
+            this.score = 0;
 
-            this.buttonq = game.add.sprite(0, 512, 'button_q');
+            //button params
+            this.buttonSize = 100;
+            this.buttonSpacing = 10;
+            this.gamestartX = (game.width - (this.buttonSize+this.buttonSpacing)*3)/2;
+            this.buttonsY = game.height-(this.buttonSize/2);
+
+            //buttonq
+            this.buttonq = game.add.sprite(this.gamestartX, this.buttonsY, 'button_q');
+            this.buttonq.anchor.set(0.5);
             this.buttonq.animations.add('pressed', [1]);
             this.buttonq.animations.add('normal', [0]);
+            this.buttonq.animations.play('normal');
 
+            //buttonw
+            this.buttonw = game.add.sprite(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY, 'button_w');
+            this.buttonw.anchor.set(0.5);
+            this.buttonw.animations.add('pressed', [1]);
+            this.buttonw.animations.add('normal', [0]);
+            this.buttonw.animations.play('normal');
+
+            //buttone
+            this.buttone = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY, 'button_e');
+            this.buttone.anchor.set(0.5);
+            this.buttone.animations.add('pressed', [1]);
+            this.buttone.animations.add('normal', [0]);
+            this.buttone.animations.play('normal');
+
+            //buttonr
+            this.buttonr = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY, 'button_r');
+            this.buttonr.anchor.set(0.5);
+            this.buttonr.animations.add('pressed', [1]);
+            this.buttonr.animations.add('normal', [0]);
+            this.buttonr.animations.play('normal');
+
+            //add hitlines for each button
+            this.hitBoxes = game.add.group();
+            this.hitBoxQ = this.hitBoxes.create(this.gamestartX, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxQ.anchor.set(0.5);
+            this.hitBoxQ.buttonName = 'q';
+            game.physics.enable(this.hitBoxQ, Phaser.Physics.ARCADE);
+
+            this.hitBoxW = this.hitBoxes.create(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxW.anchor.set(0.5);
+            this.hitBoxW.buttonName = 'w';
+            game.physics.enable(this.hitBoxW, Phaser.Physics.ARCADE);
+
+            this.hitBoxE = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxE.anchor.set(0.5);
+            this.hitBoxE.buttonName = 'e';
+            game.physics.enable(this.hitBoxE, Phaser.Physics.ARCADE);
+
+            this.hitBoxR = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxR.anchor.set(0.5);
+            this.hitBoxR.buttonName = 'r';
+            game.physics.enable(this.hitBoxR, Phaser.Physics.ARCADE);
+
+            //creating button group
+            this.buttons = game.add.group();
+
+            //adding keys
+            this.Qbtn = game.input.keyboard.addKey(Phaser.Keyboard.Q);
+            this.Wbtn = game.input.keyboard.addKey(Phaser.Keyboard.W);
+            this.Ebtn = game.input.keyboard.addKey(Phaser.Keyboard.E);
+            this.Rbtn = game.input.keyboard.addKey(Phaser.Keyboard.R);
         },
         update: function() {
+            if(this.Qbtn.isDown) {
+                this.buttonDown.q = true;
+            } else {
+                this.buttonDown.q = false;
+            }
+            if(this.Wbtn.isDown) {
+                this.buttonDown.w = true;
+            } else {
+                this.buttonDown.w = false;
+            }
+            if(this.Ebtn.isDown) {
+                this.buttonDown.e = true;
+            } else {
+                this.buttonDown.e = false;
+            }
+            if(this.Rbtn.isDown) {
+                this.buttonDown.r = true;
+            } else {
+                this.buttonDown.r = false;
+            }
 
+            //play animation if down
+            if(this.buttonDown.q) {
+                this.buttonq.animations.play('pressed');
+            } else {
+                this.buttonq.animations.play('normal');
+            }
+            if(this.buttonDown.w) {
+                this.buttonw.animations.play('pressed');
+            } else {
+                this.buttonw.animations.play('normal');
+            }
+            if(this.buttonDown.e) {
+                this.buttone.animations.play('pressed');
+            } else {
+                this.buttone.animations.play('normal');
+            }
+            if(this.buttonDown.r) {
+                this.buttonr.animations.play('pressed');
+            } else {
+                this.buttonr.animations.play('normal');
+            }
+
+            //spawn button
+            if(game.time.now >= this.nextButtonSpawn) {
+                this.nextButtonSpawn = game.time.now + 3000;
+                this.spawnButton();
+            }
+
+            game.physics.arcade.overlap(this.buttons, this.hitBoxes, function(button, hitbox) {
+                if(button.buttonName == hitbox.buttonName && SonaGame.buttonDown[button.buttonName]) {
+                    console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + button.y);
+                    SonaGame.score += Math.round(50-Math.abs(hitbox.y - button.y));
+                    button.kill();
+                } else if(button.y > hitbox.y+50){
+                    button.kill();
+                }
+            }, null, this);
+
+            this.scoreText.text = 'Score: ' + this.score;
         },
         render: function() {
+
+        },
+        spawnButton: function() {
+            var lane = game.rnd.integerInRange(0, 3);
+            var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
+            var button = this.buttons.create(spawnX, 0, 'item');
+            button.anchor.set(0.5);
+            switch(lane) {
+                case 0:
+                    button.buttonName = 'q';
+                    break;
+                case 1:
+                    button.buttonName = 'w';
+                    break;
+                case 2:
+                    button.buttonName = 'e';
+                    break;
+                case 3:
+                    button.buttonName = 'r';
+                    break;
+            }
+            game.physics.enable(button, Phaser.Physics.ARCADE);
+            button.body.setSize(100,100,0,0);
+            button.body.velocity.y = 100;
 
         }
     };
