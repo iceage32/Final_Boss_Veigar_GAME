@@ -197,20 +197,28 @@ window.onload = function() {
             game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
             game.load.image('hitline', 'assets/sona/hitline.png');
             game.load.image('item', 'assets/sona/item.png');
+            game.load.image('bg', 'assets/sona/bg.jpg');
+            game.load.image('gamebg', 'assets/sona/gamebg.png');
         },
         create: function() {
             //init arcade physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
-            //add score
-            this.scoreText = game.add.text(0, 0, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
-            this.score = 0;
-
             //button params
+            this.buttonSpeed = 200;
+            this.buttonInterval = 2500;
             this.buttonSize = 100;
             this.buttonSpacing = 10;
             this.gamestartX = (game.width - (this.buttonSize+this.buttonSpacing)*3)/2;
             this.buttonsY = game.height-(this.buttonSize/2);
+
+            this.bg = game.add.sprite(0,0, 'bg');
+
+            //add score
+            this.scoreText = game.add.text(0, 0, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
+            this.score = 0;
+
+            this.gamebg = game.add.sprite(this.gamestartX - 60,0, 'gamebg');
 
             //buttonq
             this.buttonq = game.add.sprite(this.gamestartX, this.buttonsY, 'button_q');
@@ -317,14 +325,21 @@ window.onload = function() {
 
             //spawn button
             if(game.time.now >= this.nextButtonSpawn) {
-                this.nextButtonSpawn = game.time.now + 3000;
+                this.nextButtonSpawn = game.time.now + this.buttonInterval;
                 this.spawnButton();
             }
 
             game.physics.arcade.overlap(this.buttons, this.hitBoxes, function(button, hitbox) {
                 if(button.buttonName == hitbox.buttonName && SonaGame.buttonDown[button.buttonName]) {
                     console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + button.y);
-                    SonaGame.score += Math.round(50-Math.abs(hitbox.y - button.y));
+                    var score = Math.ceil(50-Math.abs(hitbox.y - button.y));
+                    SonaGame.score += score;
+                    if(SonaGame.buttonSpeed < 400) {
+                        SonaGame.buttonSpeed += 1.25 * (1+score/100);
+                    }
+                    if(SonaGame.buttonInterval != 750) {
+                        SonaGame.buttonInterval -= 10;
+                    }
                     button.kill();
                 } else if(button.y > hitbox.y+50){
                     SonaGame.score -= 50;
@@ -338,28 +353,46 @@ window.onload = function() {
 
         },
         spawnButton: function() {
-            var lane = game.rnd.integerInRange(0, 3);
-            var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
-            var button = this.buttons.create(spawnX, 0, 'item');
-            button.anchor.set(0.5);
-            switch(lane) {
-                case 0:
-                    button.buttonName = 'q';
-                    break;
-                case 1:
-                    button.buttonName = 'w';
-                    break;
-                case 2:
-                    button.buttonName = 'e';
-                    break;
-                case 3:
-                    button.buttonName = 'r';
-                    break;
+            var num = game.rnd.integerInRange(0,100);
+            var i2 = 0;
+            if(num >=80) {
+                i2 = 1;
+                if(num >= 90) {
+                    i2 = 2;
+                    if(num >= 100) {
+                        i2 = 3;
+                    }
+                }
             }
-            game.physics.enable(button, Phaser.Physics.ARCADE);
-            button.body.setSize(100,100,0,0);
-            button.body.velocity.y = 100;
+            var lanesused = [];
+            for(var i = 0; i<=i2; i++) {
+                var lane = game.rnd.integerInRange(0, 3);
+                while(lanesused.indexOf(lane) != -1) {
+                    lane = game.rnd.integerInRange(0, 3);
+                }
+                lanesused.push(lane);
 
+                var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
+                var button = this.buttons.create(spawnX, 0, 'item');
+                button.anchor.set(0.5);
+                switch(lane) {
+                    case 0:
+                        button.buttonName = 'q';
+                        break;
+                    case 1:
+                        button.buttonName = 'w';
+                        break;
+                    case 2:
+                        button.buttonName = 'e';
+                        break;
+                    case 3:
+                        button.buttonName = 'r';
+                        break;
+                }
+                game.physics.enable(button, Phaser.Physics.ARCADE);
+                button.body.setSize(100,100,0,0);
+                button.body.velocity.y = this.buttonSpeed;
+            }
         }
     };
 
