@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/heca_run_idle_blurred.png', 187, 128, 18);
+            game.load.spritesheet('player', 'assets/idle_and_running.png', 262, 180, 18);
         },
         create: function() {
             //Enable advanced timing
@@ -58,8 +58,8 @@ window.onload = function() {
             //add a player
             this.player = game.add.sprite(80, game.world.height-512, 'player');
             //add animations
-            this.player.animations.add('run', [0,1,2,3,4,5,6,7,8,9,10,11], 16, true);
-            this.player.animations.add('idle', [12, 13, 14, 15, 16, 17], 4, true);
+            this.player.animations.add('run', [6,7,8,9,10,11,12,13,14,15], 16, true);
+            this.player.animations.add('idle', [0,1,2,3,4,5], 4, true);
             this.player.animations.play('idle');
             //enable physics for player
             game.physics.enable(this.player, Phaser.Physics.ARCADE);
