@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/heca_run_idle_blurred.png', 430, 295, 18);
+            game.load.spritesheet('player', 'assets/heca_run_idle_blurred.png', 187, 128, 18);
         },
         create: function() {
             //Enable advanced timing
@@ -68,7 +68,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(430, 295, -6, 0);
+            this.player.body.setSize(64, 128, -6, 0);
             //anchor player to center
             this.player.anchor.set(0.5);
 
