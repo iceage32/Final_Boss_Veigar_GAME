@@ -70,7 +70,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(64, 168, -6, 0);
+            this.player.body.setSize(64, 128, -6, 20);
             //anchor player to center
             this.player.anchor.set(0.5);
 
