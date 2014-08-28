@@ -9,7 +9,7 @@ window.onload = function() {
             game.load.image('pine', 'assets/background objects/pinetree.png');
             game.load.image('tileset', 'assets/tilset.png');
             game.load.tilemap('map', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.spritesheet('player', 'assets/idle_6_run_12.png', 262, 180, 18);
+            game.load.spritesheet('player', 'assets/hecarim.png', 256, 168, 17);
         },
         create: function() {
             //Enable advanced timing
@@ -18,6 +18,7 @@ window.onload = function() {
             this.gameover = false;
             //set jump timer to 0
             this.jumpTimer = 0;
+            this.jumping = false;
             //start Arcade Physics system
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -58,8 +59,9 @@ window.onload = function() {
             //add a player
             this.player = game.add.sprite(80, game.world.height-512, 'player');
             //add animations
-            this.player.animations.add('run', [6,7,8,9,10,11,12,13,14,15], 16, true);
-            this.player.animations.add('idle', [0,1,2,3,4,5], 4, true);
+            this.player.animations.add('jump', [0,1,2,3], 4, true);
+            this.player.animations.add('idle', [4, 5], 2, true);
+            this.player.animations.add('run', [6,7,8,9,10,11,12,13,14,15,16], 16, true);
             this.player.animations.play('idle');
             //enable physics for player
             game.physics.enable(this.player, Phaser.Physics.ARCADE);
@@ -68,7 +70,7 @@ window.onload = function() {
             this.player.body.collideWorldBounds = false;
 
             //set hitbox size
-            this.player.body.setSize(64, 180, -6, 0);
+            this.player.body.setSize(64, 168, -6, 0);
             //anchor player to center
             this.player.anchor.set(0.5);
 
@@ -114,24 +116,28 @@ window.onload = function() {
             if(this.cursors.left.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = -400;
-                    this.player.animations.play('run');
                 } else {
                     this.player.body.velocity.x = -250;
-                    this.player.animations.play('run');
                 }
-                this.player.animations.play('run');
+                if(!this.jumping) this.player.animations.play('run');
                 this.player.scale.x = -1;
             } else if(this.cursors.right.isDown) {
                 if(this.crtlbtn.isDown) {
                     this.player.body.velocity.x = 400;
-                    this.player.animations.play('run');
                 } else {
                     this.player.body.velocity.x = 250;
-                    this.player.animations.play('run');
                 }
+                if(!this.jumping) this.player.animations.play('run');
                 this.player.scale.x = 1;
             } else {
-                this.player.animations.play('idle');
+                if(!this.jumping) this.player.animations.play('idle');
+            }
+
+            if(!this.jumping && !this.player.body.onFloor()) {
+                this.player.animations.play('jump');
+                this.jumping = true;
+            } else if (this.jumping && this.player.body.onFloor()) {
+                this.jumping = false;
             }
 
             //level complete
@@ -205,7 +211,7 @@ window.onload = function() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
             //button params
-            this.buttonSpeed = 200;
+            this.buttonSpeed = 150;
             this.buttonInterval = 2500;
             this.buttonSize = 100;
             this.buttonSpacing = 10;
@@ -280,26 +286,14 @@ window.onload = function() {
             this.Rbtn = game.input.keyboard.addKey(Phaser.Keyboard.R);
         },
         update: function() {
-            if(this.Qbtn.isDown) {
-                this.buttonDown.q = true;
-            } else {
-                this.buttonDown.q = false;
-            }
-            if(this.Wbtn.isDown) {
-                this.buttonDown.w = true;
-            } else {
-                this.buttonDown.w = false;
-            }
-            if(this.Ebtn.isDown) {
-                this.buttonDown.e = true;
-            } else {
-                this.buttonDown.e = false;
-            }
-            if(this.Rbtn.isDown) {
-                this.buttonDown.r = true;
-            } else {
-                this.buttonDown.r = false;
-            }
+            if(this.Qbtn.isDown) this.buttonDown.q = true;
+            else this.buttonDown.q = false;
+            if(this.Wbtn.isDown) this.buttonDown.w = true;
+            else this.buttonDown.w = false;
+            if(this.Ebtn.isDown) this.buttonDown.e = true;
+            else this.buttonDown.e = false;
+            if(this.Rbtn.isDown) this.buttonDown.r = true;
+            else this.buttonDown.r = false;
 
             //play animation if down
             if(this.buttonDown.q) {
@@ -331,18 +325,19 @@ window.onload = function() {
 
             game.physics.arcade.overlap(this.buttons, this.hitBoxes, function(button, hitbox) {
                 if(button.buttonName == hitbox.buttonName && SonaGame.buttonDown[button.buttonName]) {
-                    console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + button.y);
-                    var score = Math.ceil(50-Math.abs(hitbox.y - button.y));
+                    var score = Math.abs(100 - Math.abs(hitbox.y - Math.round(button.y)));
+                    console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + Math.round(button.y) + ' and got score=' + score);
                     SonaGame.score += score;
-                    if(SonaGame.buttonSpeed < 400) {
-                        SonaGame.buttonSpeed += 1.25 * (1+score/100);
+                    if(SonaGame.buttonSpeed < 350) {
+                        SonaGame.buttonSpeed += 0.5 + (score/100);
+                        console.log('Speeding up by: ' + (0.7 + (score/100)));
                     }
-                    if(SonaGame.buttonInterval != 750) {
-                        SonaGame.buttonInterval -= 10;
+                    if(SonaGame.buttonInterval >= 500) {
+                        SonaGame.buttonInterval -= 1;
                     }
                     button.kill();
                 } else if(button.y > hitbox.y+50){
-                    SonaGame.score -= 50;
+                    SonaGame.score -= 100;
                     button.kill();
                 }
             }, null, this);
@@ -355,9 +350,9 @@ window.onload = function() {
         spawnButton: function() {
             var num = game.rnd.integerInRange(0,100);
             var i2 = 0;
-            if(num >=80) {
+            if(num >=90) {
                 i2 = 1;
-                if(num >= 90) {
+                if(num >= 95) {
                     i2 = 2;
                     if(num >= 100) {
                         i2 = 3;
