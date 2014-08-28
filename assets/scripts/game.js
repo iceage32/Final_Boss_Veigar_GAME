@@ -59,7 +59,7 @@ window.onload = function() {
             //add a player
             this.player = game.add.sprite(80, game.world.height-512, 'player');
             //add animations
-            this.player.animations.add('jump', [0,1,2,3], 4, true);
+            this.player.animations.add('jump', [0,1,2,3], 6, false);
             this.player.animations.add('idle', [4, 5], 2, true);
             this.player.animations.add('run', [6,7,8,9,10,11,12,13,14,15,16], 16, true);
             this.player.animations.play('idle');
