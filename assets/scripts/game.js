@@ -202,7 +202,10 @@ window.onload = function() {
             game.load.spritesheet('button_e', 'assets/sona/button_e.png', 100, 100, 2);
             game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
             game.load.image('hitline', 'assets/sona/hitline.png');
-            game.load.image('item', 'assets/sona/item.png');
+            game.load.image('star0', 'assets/sona/sona_star_0.png');
+            game.load.image('star1', 'assets/sona/sona_star_1.png');
+            game.load.image('star2', 'assets/sona/sona_star_2.png');
+            game.load.image('star3', 'assets/sona/sona_star_3.png');
             game.load.image('bg', 'assets/sona/bg.jpg');
             game.load.image('gamebg', 'assets/sona/gamebg.png');
         },
@@ -368,7 +371,7 @@ window.onload = function() {
                 lanesused.push(lane);
 
                 var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
-                var button = this.buttons.create(spawnX, 0, 'item');
+                var button = this.buttons.create(spawnX, 0, 'star'+lane);
                 button.anchor.set(0.5);
                 switch(lane) {
                     case 0:
