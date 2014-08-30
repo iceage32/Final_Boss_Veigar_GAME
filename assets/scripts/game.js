@@ -412,15 +412,15 @@ window.onload = function() {
             //add characters
             this.hecarim = game.add.sprite(266, 415, 'hecarim');
             this.hecarim.animations.add('idle');
-            this.hecarim.animations.play('idle', 4, true);
+            this.hecarim.animations.play('idle', 3, true);
 
             this.mf = game.add.sprite(470, 415, 'missfortune');
             this.mf.animations.add('idle');
-            this.mf.animations.play('idle', 5, true);
+            this.mf.animations.play('idle', 3, true);
 
             this.sona = game.add.sprite(650, 415, 'sona');
             this.sona.animations.add('idle');
-            this.sona.animations.play('idle', 4, true);
+            this.sona.animations.play('idle', 3, true);
             /*var buttons = game.add.group();
 
             var firstbuttonX = (game.width - (256+10)*3)/2;
