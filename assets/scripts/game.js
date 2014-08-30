@@ -396,23 +396,24 @@ window.onload = function() {
 
     var MainMenu = {
         preload: function() {
-            game.load.image('bg', 'assets/mainmenu/background_full.png')
+            game.load.image('bg', 'assets/mainmenu/background_full.png');
+            game.load.image('cloud1', 'assets/mainmenu/cloud1.png');
+            game.load.image('cloud2', 'assets/mainmenu/cloud2.png');
             game.load.spritesheet('button', 'assets/btn_sprite.png', 256, 96);
             game.load.spritesheet('sona', 'assets/mainmenu/sona_idle.png', 211, 188, 9);
             game.load.spritesheet('hecarim', 'assets/mainmenu/hecarim_idle.png', 211, 188, 4);
             game.load.spritesheet('missfortune', 'assets/mainmenu/miss_fortune_idle.png', 211, 188, 20);
         },
         create: function() {
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+
             //add background
             this.bg = game.add.sprite(0,0, 'bg');
-            //add game name
-            var text = game.add.text(game.width/2, game.height/4, "Final Boss Veigar Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
-            text.anchor.set(0.5);
 
             //add characters
             this.hecarim = game.add.sprite(266, 415, 'hecarim');
             this.hecarim.animations.add('idle');
-            this.hecarim.animations.play('idle', 3, true);
+            this.hecarim.animations.play('idle', 2, true);
 
             this.mf = game.add.sprite(470, 415, 'missfortune');
             this.mf.animations.add('idle');
@@ -421,6 +422,22 @@ window.onload = function() {
             this.sona = game.add.sprite(650, 415, 'sona');
             this.sona.animations.add('idle');
             this.sona.animations.play('idle', 3, true);
+
+            //add clouds
+            this.cloud1 = game.add.sprite(10, 150, 'cloud1');
+            game.physics.enable(this.cloud1, Phaser.Physics.ARCADE);
+            this.cloud1.body.setSize(316, 76);
+            this.cloud1.body.velocity.x = 50;
+            this.cloud2 = game.add.sprite(450, 100, 'cloud2');
+            game.physics.enable(this.cloud2, Phaser.Physics.ARCADE);
+            this.cloud2.body.setSize(318, 104);
+            this.cloud2.body.velocity.x = 50;
+
+
+            //add game name
+            var text = game.add.text(game.width/2, game.height/4, "Final Boss Veigar Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
+
             /*var buttons = game.add.group();
 
             var firstbuttonX = (game.width - (256+10)*3)/2;
@@ -444,7 +461,13 @@ window.onload = function() {
             buttons.add(sonabutton);*/
         },
         update: function() {
-
+            //cloud respawn
+            if(this.cloud1.x > game.width) {
+                this.cloud1.x = 0 - this.cloud1.width;
+            }
+            if(this.cloud2.x > game.width) {
+                this.cloud2.x = 0  - this.cloud1.width;
+            }
         },
         render: function() {
 
