@@ -399,7 +399,8 @@ window.onload = function() {
             game.load.image('bg', 'assets/mainmenu/background_full.png');
             game.load.image('cloud1', 'assets/mainmenu/cloud1.png');
             game.load.image('cloud2', 'assets/mainmenu/cloud2.png');
-            game.load.spritesheet('button', 'assets/mainmenu/heca_button.PNG', 183, 60);
+            game.load.spritesheet('heca_button', 'assets/mainmenu/heca_button.PNG', 183, 60);
+            game.load.spritesheet('sona_button', 'assets/mainmenu/sona_button.PNG', 183, 60);
             game.load.spritesheet('sona', 'assets/mainmenu/sona_idle.png', 211, 188, 9);
             game.load.spritesheet('hecarim', 'assets/mainmenu/hecarim_idle.png', 211, 188, 4);
             game.load.spritesheet('missfortune', 'assets/mainmenu/miss_fortune_idle.png', 211, 188, 20);
@@ -441,17 +442,17 @@ window.onload = function() {
             var buttons = game.add.group();
 
             var firstbuttonX = (game.width - (186+10)*3)/2;
-            var buttonY = game.height-80;
+            var buttonY = game.height-78;
 
-            var hecarimbutton = game.add.button(firstbuttonX, buttonY, 'button', function() {
+            var hecarimbutton = game.add.button(firstbuttonX, buttonY, 'heca_button', function() {
                 game.state.start('game_hecarim');
             }, this, 1, 0, 2, 0);
             //hecarimbutton.anchor.set(0.5);
-            var missfortunebutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'button', function() {
+            var missfortunebutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'heca_button', function() {
                 game.state.start('game_missfortune');
             }, this, 1, 0, 2, 0);
             //missfortunebutton.anchor.set(0.5);
-            var sonabutton = game.add.button(firstbuttonX + (186 + 10)*2, buttonY, 'button', function() {
+            var sonabutton = game.add.button(firstbuttonX + (186 + 10)*2, buttonY, 'sona_button', function() {
                 game.state.start('game_sona');
             }, this, 1, 0, 2, 0);
             //sonabutton.anchor.set(0.5);
