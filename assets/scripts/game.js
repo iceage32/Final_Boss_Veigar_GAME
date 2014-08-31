@@ -402,6 +402,7 @@ window.onload = function() {
             game.load.image('cloud2', 'assets/mainmenu/cloud2.png');
             game.load.spritesheet('heca_button', 'assets/mainmenu/heca_button.PNG', 183, 60);
             game.load.spritesheet('sona_button', 'assets/mainmenu/sona_button.png', 183, 60);
+            game.load.spritesheet('mf_button', 'assets/mainmenu/mf_button.png', 183, 60);
             game.load.spritesheet('sona', 'assets/mainmenu/sona_idle.png', 211, 188, 9);
             game.load.spritesheet('hecarim', 'assets/mainmenu/hecarim_idle.png', 211, 188, 4);
             game.load.spritesheet('missfortune', 'assets/mainmenu/miss_fortune_idle.png', 211, 188, 20);
@@ -449,7 +450,7 @@ window.onload = function() {
                 game.state.start('game_hecarim');
             }, this, 1, 0, 2, 0);
             //hecarimbutton.anchor.set(0.5);
-            var missfortunebutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'heca_button', function() {
+            var missfortunebutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'mf_button', function() {
                 game.state.start('game_missfortune');
             }, this, 1, 0, 2, 0);
             //missfortunebutton.anchor.set(0.5);
