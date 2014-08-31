@@ -373,6 +373,7 @@ window.onload = function() {
                 var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
                 var button = this.buttons.create(spawnX, 0, 'star'+lane);
                 button.anchor.set(0.5);
+                button.alpha = 0.8;
                 switch(lane) {
                     case 0:
                         button.buttonName = 'q';
@@ -425,11 +426,11 @@ window.onload = function() {
             this.sona.animations.play('idle', 3, true);
 
             //add clouds
-            this.cloud1 = game.add.sprite(10, 150, 'cloud1');
+            this.cloud1 = game.add.sprite(10, 130, 'cloud1');
             game.physics.enable(this.cloud1, Phaser.Physics.ARCADE);
             this.cloud1.body.setSize(316, 76);
             this.cloud1.body.velocity.x = 50;
-            this.cloud2 = game.add.sprite(450, 100, 'cloud2');
+            this.cloud2 = game.add.sprite(450, 90, 'cloud2');
             game.physics.enable(this.cloud2, Phaser.Physics.ARCADE);
             this.cloud2.body.setSize(318, 104);
             this.cloud2.body.velocity.x = 50;
@@ -469,6 +470,8 @@ window.onload = function() {
             if(this.cloud2.x > game.width) {
                 this.cloud2.x = 0  - this.cloud1.width;
             }
+            this.cloud1.body.velocity.y = Math.cos(this.cloud1.x/40)* 5;
+            this.cloud2.body.velocity.y = Math.cos(this.cloud2.x/35)* 5;
         },
         render: function() {
 
