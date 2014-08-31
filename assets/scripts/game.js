@@ -400,6 +400,7 @@ window.onload = function() {
             game.load.image('bg', 'assets/mainmenu/background_full.png');
             game.load.image('cloud1', 'assets/mainmenu/cloud1.png');
             game.load.image('cloud2', 'assets/mainmenu/cloud2.png');
+            game.load.image('logo', 'assets/mainmenu/logo.png');
             game.load.spritesheet('heca_button', 'assets/mainmenu/heca_button.PNG', 183, 60);
             game.load.spritesheet('sona_button', 'assets/mainmenu/sona_button.png', 183, 60);
             game.load.spritesheet('mf_button', 'assets/mainmenu/mf_button.png', 183, 60);
@@ -438,8 +439,9 @@ window.onload = function() {
 
 
             //add game name
-            var text = game.add.text(game.width/2, game.height/4, "Final Boss Veigar Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
-            text.anchor.set(0.5);
+            this.logo = game.add.sprite(game.world.centerX, 150, 'logo');
+            this.logo.anchor.set(0.5);
+            game.physics.enable(this.logo, Phaser.Physics.ARCADE);
 
             var buttons = game.add.group();
 
@@ -473,6 +475,7 @@ window.onload = function() {
             }
             this.cloud1.body.velocity.y = Math.cos(this.cloud1.x/40)* 5;
             this.cloud2.body.velocity.y = Math.cos(this.cloud2.x/35)* 5;
+            this.logo.body.velocity.y = (Math.cos(game.time.now/400) *40)*0.25;
         },
         render: function() {
 
