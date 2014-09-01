@@ -1,5 +1,5 @@
 window.onload = function() {
-    var game = new Phaser.Game(1280, 720, Phaser.CANVAS, 'game');
+    var game = new Phaser.Game(1024, 576, Phaser.CANVAS, 'game');
 
     var HecarimGame = {
         gameover: false,
@@ -208,10 +208,15 @@ window.onload = function() {
             game.load.image('star3', 'assets/sona/sona_star_3.png');
             game.load.image('bg', 'assets/sona/bg.jpg');
             game.load.image('gamebg', 'assets/sona/gamebg.png');
+            game.load.image('heart', 'assets/sona/heart.png');
+            game.load.image('heartbroken', 'assets/sona/heart_broken.png');
         },
         create: function() {
             //init arcade physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
+
+            this.gameover = false;
+            this.hearts = 3;
 
             //button params
             this.buttonSpeed = 150;
@@ -224,10 +229,10 @@ window.onload = function() {
             this.bg = game.add.sprite(0,0, 'bg');
 
             //add score
-            this.scoreText = game.add.text(0, 0, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
+            this.scoreText = game.add.text(10, game.height-82, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
             this.score = 0;
 
-            this.gamebg = game.add.sprite(this.gamestartX - 60,0, 'gamebg');
+            this.gamebg = game.add.sprite(this.gamestartX - 60,game.height-720, 'gamebg');
 
             //buttonq
             this.buttonq = game.add.sprite(this.gamestartX, this.buttonsY, 'button_q');
@@ -282,13 +287,50 @@ window.onload = function() {
             //creating button group
             this.buttons = game.add.group();
 
+            //adding hearts
+            this.heartGroup = game.add.group();
+            for(var i = 0; i<this.hearts;i++) {
+                this.heartGroup.create(10+(32+10)*i, game.height-10-32, 'heart');
+            }
+
             //adding keys
             this.Qbtn = game.input.keyboard.addKey(Phaser.Keyboard.Q);
             this.Wbtn = game.input.keyboard.addKey(Phaser.Keyboard.W);
             this.Ebtn = game.input.keyboard.addKey(Phaser.Keyboard.E);
             this.Rbtn = game.input.keyboard.addKey(Phaser.Keyboard.R);
+
+            //add global controls
+            this.menubutton = game.add.text(0, 0, "Main Menu", { font: "24px Arial", fill: "#ffffff"});
+            this.menubutton.inputEnabled = true;
+            this.menubutton.input.useHandCursor = true;
+            this.menubutton.events.onInputDown.add(function() {
+                window.onblur = null;
+                game.state.start('mainmenu');
+            }, this);
+
+            this.pausebutton = game.add.text(game.width-24, 0, "||", { font: "24px Arial", fill: "#ffffff"});
+            this.pausebutton.inputEnabled = true;
+            this.pausebutton.input.useHandCursor = true;
+            this.pausebutton.events.onInputDown.add(function() {
+                this.pause();
+            }, this);
+
+            game.input.onDown.add(function() {
+                if(game.paused && !SonaGame.gameover) {
+                    SonaGame.unpause();
+                }
+                if(SonaGame.gameover) {
+                    SonaGame.gameOverClick();
+                }
+            });
+
+            window.onblur = function() {
+                SonaGame.pause();
+            }
         },
         update: function() {
+            if(this.hearts <= 0) this.gameOver();
+
             if(this.Qbtn.isDown) this.buttonDown.q = true;
             else this.buttonDown.q = false;
             if(this.Wbtn.isDown) this.buttonDown.w = true;
@@ -341,6 +383,7 @@ window.onload = function() {
                     button.kill();
                 } else if(button.y > hitbox.y+50){
                     SonaGame.score -= 100;
+                    SonaGame.loseLife();
                     button.kill();
                 }
             }, null, this);
@@ -392,11 +435,51 @@ window.onload = function() {
                 button.body.setSize(100,100,0,0);
                 button.body.velocity.y = this.buttonSpeed;
             }
+        },
+        pause: function() {
+            if(!game.paused) {
+                game.paused = true;
+                this.pausetext = game.add.text(game.world.centerX, game.world.centerY, "Game Paused\nClick anywhere to unpause", { font: "24px Arial", fill: "#ffffff", align: 'center'});
+                this.pausetext.anchor.set(0.5);
+            }
+        },
+        unpause: function() {
+            if(game.paused) {
+                this.pausetext.destroy();
+                game.paused = false;
+            }
+        },
+        loseLife: function() {
+            this.hearts -= 1;
+            for(var i = this.heartGroup.length-1; i>=0; i--) {
+                var heart = this.heartGroup.getAt(i);
+                if(heart.key != 'heartbroken') {
+                    heart.loadTexture('heartbroken');
+                    break;
+                }
+            }
+        },
+        gameOver: function() {
+            this.gameover = true;
+            game.paused = true;
+            this.gameovertext = game.add.text(game.world.centerX, game.world.centerY, "Game Over\nScore: " + this.score + '\nClick to return to main menu', { font: "24px Arial", fill: "#ffffff", align: 'center'});
+            this.gameovertext.anchor.set(0.5);
+        },
+        gameOverClick: function() {
+            game.paused = false;
+            window.onblur = null;
+            game.state.start('mainmenu');
         }
     };
 
     var MainMenu = {
         preload: function() {
+            this.loadtext = game.add.text(game.world.centerX, game.world.centerY-45, 'Loading', {font: '24px Arial', fill: '#FFF'});
+            this.loadtext.anchor.set(0.5);
+            this.loadsprite = game.add.sprite(game.world.centerX, game.world.centerY, 'loadingbar');
+            this.loadsprite.anchor.set(0.5);
+            game.load.setPreloadSprite(this.loadsprite);
+
             game.load.image('bg', 'assets/mainmenu/background_full.png');
             game.load.image('cloud1', 'assets/mainmenu/cloud1.png');
             game.load.image('cloud2', 'assets/mainmenu/cloud2.png');
@@ -413,17 +496,20 @@ window.onload = function() {
 
             //add background
             this.bg = game.add.sprite(0,0, 'bg');
+            this.bg.scale.x = (game.width)/1280;
+            this.bg.scale.y = (game.height)/720;
 
             //add characters
-            this.hecarim = game.add.sprite(266, 415, 'hecarim');
+            var characterY = (game.height*(720-116)/720)-188;
+            this.hecarim = game.add.sprite(266, characterY, 'hecarim');
             this.hecarim.animations.add('idle');
             this.hecarim.animations.play('idle', 2, true);
 
-            this.mf = game.add.sprite(470, 415, 'missfortune');
+            this.mf = game.add.sprite(470, characterY, 'missfortune');
             this.mf.animations.add('idle');
             this.mf.animations.play('idle', 3, true);
 
-            this.sona = game.add.sprite(650, 415, 'sona');
+            this.sona = game.add.sprite(650, characterY, 'sona');
             this.sona.animations.add('idle');
             this.sona.animations.play('idle', 3, true);
 
@@ -481,12 +567,21 @@ window.onload = function() {
 
         }
     };
+    var Boot = {
+        preload: function() {
+            game.load.image('loadingbar', 'assets/loadingbar.png');
+        },
+        create: function() {
+            game.state.start('mainmenu');
+        }
+    }
 
     game.state.add('game_hecarim', HecarimGame);
     game.state.add('game_missfortune', MissFortuneGame);
     game.state.add('game_sona', SonaGame);
     game.state.add('mainmenu', MainMenu);
+    game.state.add('boot', Boot);
 
-    game.state.start('mainmenu');
+    game.state.start('boot');
 
 };
