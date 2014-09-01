@@ -195,7 +195,7 @@ window.onload = function() {
             game.load.spritesheet('button_w', 'assets/sona/button_w.png', 100, 100, 2);
             game.load.spritesheet('button_e', 'assets/sona/button_e.png', 100, 100, 2);
             game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
-            game.load.spritesheet('mainmenubutton', 'assets/sona/main_menu_button.PNG', 286, 86);
+            game.load.spritesheet('mainmenubutton', 'assets/sona/main_menu_button.png', 286, 86);
             game.load.image('hitline', 'assets/sona/hitline.png');
             game.load.image('star0', 'assets/sona/sona_star_0.png');
             game.load.image('star1', 'assets/sona/sona_star_1.png');
