@@ -189,18 +189,13 @@ window.onload = function() {
 
 
     var SonaGame = {
-        buttonDown: {
-            'q': false,
-            'w': false,
-            'e': false,
-            'r': false
-        },
         nextButtonSpawn: 0,
         preload: function() {
             game.load.spritesheet('button_q', 'assets/sona/button_q.png', 100, 100, 2);
             game.load.spritesheet('button_w', 'assets/sona/button_w.png', 100, 100, 2);
             game.load.spritesheet('button_e', 'assets/sona/button_e.png', 100, 100, 2);
             game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
+            game.load.spritesheet('mainmenubutton', 'assets/sona/main_menu_button.PNG', 286, 86);
             game.load.image('hitline', 'assets/sona/hitline.png');
             game.load.image('star0', 'assets/sona/sona_star_0.png');
             game.load.image('star1', 'assets/sona/sona_star_1.png');
@@ -215,8 +210,21 @@ window.onload = function() {
             //init arcade physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
+            this.buttonDown = {
+                'q': false,
+                'w': false,
+                'e': false,
+                'r': false
+            };
+            this.overlap = {
+                'q': false,
+                'w': false,
+                'e': false,
+                'r': false
+            };
             this.gameover = false;
             this.hearts = 3;
+            this.pausetime = 0;
 
             //button params
             this.buttonSpeed = 150;
@@ -299,14 +307,33 @@ window.onload = function() {
             this.Ebtn = game.input.keyboard.addKey(Phaser.Keyboard.E);
             this.Rbtn = game.input.keyboard.addKey(Phaser.Keyboard.R);
 
+            this.Qbtn.onDown.add(function() {
+                if(!SonaGame.overlap.q) {
+                    SonaGame.loseLife();
+                }
+            });
+            this.Wbtn.onDown.add(function() {
+                if(!SonaGame.overlap.w) {
+                    SonaGame.loseLife();
+                }
+            });
+            this.Ebtn.onDown.add(function() {
+                if(!SonaGame.overlap.e) {
+                    SonaGame.loseLife();
+                }
+            });
+            this.Rbtn.onDown.add(function() {
+                if(!SonaGame.overlap.r) {
+                    SonaGame.loseLife();
+                }
+            });
+
             //add global controls
-            this.menubutton = game.add.text(0, 0, "Main Menu", { font: "24px Arial", fill: "#ffffff"});
-            this.menubutton.inputEnabled = true;
-            this.menubutton.input.useHandCursor = true;
-            this.menubutton.events.onInputDown.add(function() {
+            this.menubutton = game.add.button(5, 5, 'mainmenubutton', function() {
                 window.onblur = null;
                 game.state.start('mainmenu');
-            }, this);
+            }, this, 1, 0, 2, 0);
+            this.menubutton.scale.set(0.5);
 
             this.pausebutton = game.add.text(game.width-24, 0, "||", { font: "24px Arial", fill: "#ffffff"});
             this.pausebutton.inputEnabled = true;
@@ -369,22 +396,27 @@ window.onload = function() {
             }
 
             game.physics.arcade.overlap(this.buttons, this.hitBoxes, function(button, hitbox) {
-                if(button.buttonName == hitbox.buttonName && SonaGame.buttonDown[button.buttonName]) {
-                    var score = Math.abs(100 - Math.abs(hitbox.y - Math.round(button.y)));
-                    console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + Math.round(button.y) + ' and got score=' + score);
-                    SonaGame.score += score;
-                    if(SonaGame.buttonSpeed < 350) {
-                        SonaGame.buttonSpeed += 0.5 + (score/100);
-                        console.log('Speeding up by: ' + (0.7 + (score/100)));
+                if(button.buttonName == hitbox.buttonName) {
+                    if (SonaGame.buttonDown[button.buttonName]) {
+                        var score = Math.abs(100 - Math.abs(hitbox.y - Math.round(button.y)));
+                        console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + Math.round(button.y) + ' and got score=' + score);
+                        SonaGame.score += score;
+                        if (SonaGame.buttonSpeed < 350) {
+                            SonaGame.buttonSpeed += 0.5 + (score / 100);
+                            console.log('Speeding up by: ' + (0.7 + (score / 100)));
+                        }
+                        if (SonaGame.buttonInterval >= 500) {
+                            SonaGame.buttonInterval -= 1;
+                        }
+                        button.kill();
+                    } else if (button.y > hitbox.y + 50) {
+                        SonaGame.score -= 100;
+                        SonaGame.loseLife();
+                        button.kill();
+                        SonaGame.overlap[button.buttonName] = false;
+                    } else {
+                        SonaGame.overlap[button.buttonName] = true;
                     }
-                    if(SonaGame.buttonInterval >= 500) {
-                        SonaGame.buttonInterval -= 1;
-                    }
-                    button.kill();
-                } else if(button.y > hitbox.y+50){
-                    SonaGame.score -= 100;
-                    SonaGame.loseLife();
-                    button.kill();
                 }
             }, null, this);
 
@@ -438,6 +470,7 @@ window.onload = function() {
         },
         pause: function() {
             if(!game.paused) {
+                this.pausetime = game.time.now;
                 game.paused = true;
                 this.pausetext = game.add.text(game.world.centerX, game.world.centerY, "Game Paused\nClick anywhere to unpause", { font: "24px Arial", fill: "#ffffff", align: 'center'});
                 this.pausetext.anchor.set(0.5);
@@ -447,6 +480,7 @@ window.onload = function() {
             if(game.paused) {
                 this.pausetext.destroy();
                 game.paused = false;
+                this.nextButtonSpawn = this.pausetime - this.nextButtonSpawn + game.time.now;
             }
         },
         loseLife: function() {
