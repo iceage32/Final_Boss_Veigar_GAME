@@ -189,7 +189,7 @@ window.onload = function() {
 
 
     var SonaGame = {
-        'buttonDown': {
+        buttonDown: {
             'q': false,
             'w': false,
             'e': false,
