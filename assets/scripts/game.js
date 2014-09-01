@@ -409,6 +409,7 @@ window.onload = function() {
                             SonaGame.buttonInterval -= 1;
                         }
                         button.kill();
+                        SonaGame.overlap[button.buttonName] = false;
                     } else if (button.y > hitbox.y + 50) {
                         SonaGame.score -= 100;
                         SonaGame.loseLife();
