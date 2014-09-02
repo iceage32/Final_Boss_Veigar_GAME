@@ -411,7 +411,6 @@ window.onload = function() {
                         button.kill();
                         SonaGame.overlap[button.buttonName] = false;
                     } else if (button.y > hitbox.y + 50) {
-                        SonaGame.score -= 100;
                         SonaGame.loseLife();
                         button.kill();
                         SonaGame.overlap[button.buttonName] = false;
