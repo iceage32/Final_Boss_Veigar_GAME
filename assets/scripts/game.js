@@ -12,6 +12,11 @@ window.onload = function() {
             game.load.spritesheet('player', 'assets/hecarim.png', 256, 168, 17);
         },
         create: function() {
+            this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
+                window.onblur = null;
+                game.state.start('mainmenu');
+            }, this, 1, 0, 2, 0);
+            this.menubutton.scale.set(0.5);
             //Enable advanced timing
             game.time.advancedTiming = true;
             //set gameover to false
@@ -170,42 +175,29 @@ window.onload = function() {
             this.gameover = true;
         }
     };
-
-    var MissFortuneGame = {
-        preload: function() {
-
-        },
+    var HecarimGame = {
         create: function() {
-            var text = game.add.text(game.width/2, game.height/2, "Miss Fortune Game", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
+                window.onblur = null;
+                game.state.start('mainmenu');
+            }, this, 1, 0, 2, 0);
+            this.menubutton.scale.set(0.5);
+            var text = game.add.text(game.width/2, game.height/2, "Soon™", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
         },
-        update: function() {
-
-        },
-        render: function() {
-
+    };
+    var MissFortuneGame = {
+        create: function() {
+            this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
+                window.onblur = null;
+                game.state.start('mainmenu');
+            }, this, 1, 0, 2, 0);
+            this.menubutton.scale.set(0.5);
+            var text = game.add.text(game.width/2, game.height/2, "Soon™", { font: "65px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
         }
     };
-
-
     var SonaGame = {
-        nextButtonSpawn: 0,
-        preload: function() {
-            game.load.spritesheet('button_q', 'assets/sona/button_q.png', 100, 100, 2);
-            game.load.spritesheet('button_w', 'assets/sona/button_w.png', 100, 100, 2);
-            game.load.spritesheet('button_e', 'assets/sona/button_e.png', 100, 100, 2);
-            game.load.spritesheet('button_r', 'assets/sona/button_r.png', 100, 100, 2);
-            game.load.spritesheet('mainmenubutton', 'assets/sona/main_menu_button.png', 286, 86);
-            game.load.image('hitline', 'assets/sona/hitline.png');
-            game.load.image('star0', 'assets/sona/sona_star_0.png');
-            game.load.image('star1', 'assets/sona/sona_star_1.png');
-            game.load.image('star2', 'assets/sona/sona_star_2.png');
-            game.load.image('star3', 'assets/sona/sona_star_3.png');
-            game.load.image('bg', 'assets/sona/bg.jpg');
-            game.load.image('gamebg', 'assets/sona/gamebg.png');
-            game.load.image('heart', 'assets/sona/heart.png');
-            game.load.image('heartbroken', 'assets/sona/heart_broken.png');
-        },
         create: function() {
             //init arcade physics
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -223,48 +215,99 @@ window.onload = function() {
                 'r': false
             };
             this.gameover = false;
+            this.nextButtonSpawn = 0;
             this.hearts = 3;
             this.pausetime = 0;
 
+            //set difficulty
+
+            switch(this.difficulty) {
+                case 0:
+                    this.buttonSpeed = 250;
+                    this.maxButtonSpeed = 300;
+                    this.buttonInterval = 1000;
+                    this.minButtonInterval = 800;
+                    this.buttonSpeedIncrement = 1;
+                    this.buttonIntervalDecrement = 1;
+                    this.oneButtonChance = 85;
+                    this.twoButtonChance = 95;
+                    this.threeButtonChance = 100;
+                    this.fourButtonChance = -1;
+                    break;
+                case 1:
+                    this.buttonSpeed = 300;
+                    this.maxButtonSpeed = 350;
+                    this.buttonInterval = 800;
+                    this.minButtonInterval = 700;
+                    this.buttonSpeedIncrement = 1;
+                    this.buttonIntervalDecrement = 1;
+                    this.oneButtonChance = 75;
+                    this.twoButtonChance = 85;
+                    this.threeButtonChance = 100;
+                    this.fourButtonChance = -1;
+                    break;
+                case 2:
+                    this.buttonSpeed = 350;
+                    this.maxButtonSpeed = 350;
+                    this.buttonInterval = 700;
+                    this.minButtonInterval = 625;
+                    this.buttonSpeedIncrement = 2;
+                    this.buttonIntervalDecrement = 2;
+                    this.oneButtonChance = 70;
+                    this.twoButtonChance = 80;
+                    this.threeButtonChance = 90;
+                    this.fourButtonChance = 100;
+                    break;
+                case 3:
+                    this.buttonSpeed = 450;
+                    this.maxButtonSpeed = 550;
+                    this.buttonInterval = 625;
+                    this.minButtonInterval = 475;
+                    this.buttonSpeedIncrement = 3;
+                    this.buttonIntervalDecrement = 3;
+                    this.oneButtonChance = 60;
+                    this.twoButtonChance = 75;
+                    this.threeButtonChance = 85;
+                    this.fourButtonChance = 100;
+                    break;
+            }
             //button params
-            this.buttonSpeed = 150;
-            this.buttonInterval = 2500;
             this.buttonSize = 100;
             this.buttonSpacing = 10;
             this.gamestartX = (game.width - (this.buttonSize+this.buttonSpacing)*3)/2;
             this.buttonsY = game.height-(this.buttonSize/2);
 
-            this.bg = game.add.sprite(0,0, 'bg');
+            this.bg = game.add.sprite(0,0, 'sona_bg');
 
             //add score
             this.scoreText = game.add.text(10, game.height-82, "Score: 0", { font: "28px Arial", fill: "#ffffff"});
             this.score = 0;
 
-            this.gamebg = game.add.sprite(this.gamestartX - 60,game.height-720, 'gamebg');
+            this.gamebg = game.add.sprite(this.gamestartX - 60,game.height-720, 'sona_gamebg');
 
             //buttonq
-            this.buttonq = game.add.sprite(this.gamestartX, this.buttonsY, 'button_q');
+            this.buttonq = game.add.sprite(this.gamestartX, this.buttonsY, 'sona_button_q');
             this.buttonq.anchor.set(0.5);
             this.buttonq.animations.add('pressed', [1]);
             this.buttonq.animations.add('normal', [0]);
             this.buttonq.animations.play('normal');
 
             //buttonw
-            this.buttonw = game.add.sprite(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY, 'button_w');
+            this.buttonw = game.add.sprite(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY, 'sona_button_w');
             this.buttonw.anchor.set(0.5);
             this.buttonw.animations.add('pressed', [1]);
             this.buttonw.animations.add('normal', [0]);
             this.buttonw.animations.play('normal');
 
             //buttone
-            this.buttone = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY, 'button_e');
+            this.buttone = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY, 'sona_button_e');
             this.buttone.anchor.set(0.5);
             this.buttone.animations.add('pressed', [1]);
             this.buttone.animations.add('normal', [0]);
             this.buttone.animations.play('normal');
 
             //buttonr
-            this.buttonr = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY, 'button_r');
+            this.buttonr = game.add.sprite(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY, 'sona_button_r');
             this.buttonr.anchor.set(0.5);
             this.buttonr.animations.add('pressed', [1]);
             this.buttonr.animations.add('normal', [0]);
@@ -272,22 +315,22 @@ window.onload = function() {
 
             //add hitlines for each button
             this.hitBoxes = game.add.group();
-            this.hitBoxQ = this.hitBoxes.create(this.gamestartX, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxQ = this.hitBoxes.create(this.gamestartX, this.buttonsY - this.buttonSize, 'sona_hitline');
             this.hitBoxQ.anchor.set(0.5);
             this.hitBoxQ.buttonName = 'q';
             game.physics.enable(this.hitBoxQ, Phaser.Physics.ARCADE);
 
-            this.hitBoxW = this.hitBoxes.create(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxW = this.hitBoxes.create(this.gamestartX+this.buttonSize+this.buttonSpacing, this.buttonsY - this.buttonSize, 'sona_hitline');
             this.hitBoxW.anchor.set(0.5);
             this.hitBoxW.buttonName = 'w';
             game.physics.enable(this.hitBoxW, Phaser.Physics.ARCADE);
 
-            this.hitBoxE = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxE = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*2, this.buttonsY - this.buttonSize, 'sona_hitline');
             this.hitBoxE.anchor.set(0.5);
             this.hitBoxE.buttonName = 'e';
             game.physics.enable(this.hitBoxE, Phaser.Physics.ARCADE);
 
-            this.hitBoxR = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY - this.buttonSize, 'hitline');
+            this.hitBoxR = this.hitBoxes.create(this.gamestartX+(this.buttonSize+this.buttonSpacing)*3, this.buttonsY - this.buttonSize, 'sona_hitline');
             this.hitBoxR.anchor.set(0.5);
             this.hitBoxR.buttonName = 'r';
             game.physics.enable(this.hitBoxR, Phaser.Physics.ARCADE);
@@ -298,7 +341,7 @@ window.onload = function() {
             //adding hearts
             this.heartGroup = game.add.group();
             for(var i = 0; i<this.hearts;i++) {
-                this.heartGroup.create(10+(32+10)*i, game.height-10-32, 'heart');
+                this.heartGroup.create(10+(32+10)*i, game.height-10-32, 'sona_heart');
             }
 
             //adding keys
@@ -329,7 +372,7 @@ window.onload = function() {
             });
 
             //add global controls
-            this.menubutton = game.add.button(5, 5, 'mainmenubutton', function() {
+            this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
                 window.onblur = null;
                 game.state.start('mainmenu');
             }, this, 1, 0, 2, 0);
@@ -401,16 +444,25 @@ window.onload = function() {
                         var score = Math.abs(100 - Math.abs(hitbox.y - Math.round(button.y)));
                         console.log('You hit the button at hitbox y=' + hitbox.y + ' and button y=' + Math.round(button.y) + ' and got score=' + score);
                         SonaGame.score += score;
-                        if (SonaGame.buttonSpeed < 350) {
-                            SonaGame.buttonSpeed += 0.5 + (score / 100);
-                            console.log('Speeding up by: ' + (0.7 + (score / 100)));
+                        if (SonaGame.buttonSpeed < SonaGame.maxButtonSpeed) {
+                            SonaGame.buttonSpeed += SonaGame.buttonSpeedIncrement;
+                            console.log('Speeding up by: ' + SonaGame.buttonSpeedIncrement);
                         }
-                        if (SonaGame.buttonInterval >= 500) {
-                            SonaGame.buttonInterval -= 1;
+                        if (SonaGame.buttonInterval >= SonaGame.minButtonInterval) {
+                            SonaGame.buttonInterval -= SonaGame.buttonIntervalDecrement;
                         }
+                        this.buttons.setAll('body.velocity.y', SonaGame.buttonSpeed);
                         button.kill();
                         SonaGame.overlap[button.buttonName] = false;
                     } else if (button.y > hitbox.y + 50) {
+                        if (SonaGame.buttonSpeed < SonaGame.maxButtonSpeed) {
+                            SonaGame.buttonSpeed += SonaGame.buttonSpeedIncrement;
+                            console.log('Speeding up by: ' + SonaGame.buttonSpeedIncrement);
+                        }
+                        if (SonaGame.buttonInterval >= SonaGame.minButtonInterval) {
+                            SonaGame.buttonInterval -= SonaGame.buttonIntervalDecrement;
+                        }
+                        this.buttons.setAll('body.velocity.y', SonaGame.buttonSpeed);
                         SonaGame.loseLife();
                         button.kill();
                         SonaGame.overlap[button.buttonName] = false;
@@ -428,12 +480,21 @@ window.onload = function() {
         spawnButton: function() {
             var num = game.rnd.integerInRange(0,100);
             var i2 = 0;
-            if(num >=90) {
-                i2 = 1;
-                if(num >= 95) {
-                    i2 = 2;
-                    if(num >= 100) {
-                        i2 = 3;
+
+            //num spawned
+            if(num <= this.oneButtonChance) {
+                i2 = 0;
+            } else {
+                if(num <= this.twoButtonChance) {
+                    i2 = 1;
+                }
+                else {
+                    if(num <= this.threeButtonChance) {
+                        i2 = 2;
+                    } else {
+                        if(num <= this.fourButtonChance) {
+                            i2 = 3;
+                        }
                     }
                 }
             }
@@ -446,7 +507,7 @@ window.onload = function() {
                 lanesused.push(lane);
 
                 var spawnX = this.gamestartX+(this.buttonSize+this.buttonSpacing)*lane;
-                var button = this.buttons.create(spawnX, 0, 'star'+lane);
+                var button = this.buttons.create(spawnX, 0, 'sona_star'+lane);
                 button.anchor.set(0.5);
                 button.alpha = 0.8;
                 switch(lane) {
@@ -487,8 +548,8 @@ window.onload = function() {
             this.hearts -= 1;
             for(var i = this.heartGroup.length-1; i>=0; i--) {
                 var heart = this.heartGroup.getAt(i);
-                if(heart.key != 'heartbroken') {
-                    heart.loadTexture('heartbroken');
+                if(heart.key != 'sona_heartbroken') {
+                    heart.loadTexture('sona_heartbroken');
                     break;
                 }
             }
@@ -502,10 +563,40 @@ window.onload = function() {
         gameOverClick: function() {
             game.paused = false;
             window.onblur = null;
-            game.state.start('mainmenu');
+            game.state.start('game_sona_difficulty');
         }
     };
+    var SonaDifficultySelect = {
+        create: function() {
+            this.bg = game.add.sprite(0,0, 'sona_bg');
+            this.text = game.add.text(game.world.centerX, game.world.height/6, 'Select difficulty:', {font: "24px Arial", fill:'#FFFFFF'});
+            this.text.anchor.set(0.5);
 
+            this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
+                window.onblur = null;
+                game.state.start('mainmenu');
+            }, this, 1, 0, 2, 0);
+            this.menubutton.scale.set(0.5);
+
+            this.easybutton = game.add.button(game.world.centerX-100, game.world.height/6+30, 'sona_difficulty_button_easy', function() {
+                SonaGame.difficulty = 0;
+                game.state.start('game_sona');
+            }, this, 1, 0, 2, 0);
+            this.mediumbutton = game.add.button(game.world.centerX-100, game.world.height/6+30+(60+10), 'sona_difficulty_button_medium', function() {
+                SonaGame.difficulty = 1;
+                game.state.start('game_sona');
+            }, this, 1, 0, 2, 0);
+            this.hardbutton = game.add.button(game.world.centerX-100, game.world.height/6+30+(60+10)*2, 'sona_difficulty_button_hard', function() {
+                SonaGame.difficulty = 2;
+                game.state.start('game_sona');
+            }, this, 1, 0, 2, 0);
+            this.hardcorebutton = game.add.button(game.world.centerX-100, game.world.height/6+30+(60+10)*3, 'sona_difficulty_button_hardcore', function() {
+                SonaGame.difficulty = 3;
+                game.state.start('game_sona');
+            }, this, 1, 0, 2, 0);
+
+        }
+    };
     var MainMenu = {
         preload: function() {
             this.loadtext = game.add.text(game.world.centerX, game.world.centerY-45, 'Loading', {font: '24px Arial', fill: '#FFF'});
@@ -524,6 +615,28 @@ window.onload = function() {
             game.load.spritesheet('sona', 'assets/mainmenu/sona_idle.png', 211, 188, 9);
             game.load.spritesheet('hecarim', 'assets/mainmenu/hecarim_idle.png', 211, 188, 4);
             game.load.spritesheet('missfortune', 'assets/mainmenu/miss_fortune_idle.png', 211, 188, 20);
+
+            //sona
+            game.load.spritesheet('sona_button_q', 'assets/sona/button_q.png', 100, 100, 2);
+            game.load.spritesheet('sona_button_w', 'assets/sona/button_w.png', 100, 100, 2);
+            game.load.spritesheet('sona_button_e', 'assets/sona/button_e.png', 100, 100, 2);
+            game.load.spritesheet('sona_button_r', 'assets/sona/button_r.png', 100, 100, 2);
+            game.load.spritesheet('sona_mainmenubutton', 'assets/sona/main_menu_button.png', 286, 86);
+            game.load.image('sona_hitline', 'assets/sona/hitline.png');
+            game.load.image('sona_star0', 'assets/sona/sona_star_0.png');
+            game.load.image('sona_star1', 'assets/sona/sona_star_1.png');
+            game.load.image('sona_star2', 'assets/sona/sona_star_2.png');
+            game.load.image('sona_star3', 'assets/sona/sona_star_3.png');
+            game.load.image('sona_bg', 'assets/sona/bg.jpg');
+            game.load.image('sona_gamebg', 'assets/sona/gamebg.png');
+            game.load.image('sona_heart', 'assets/sona/heart.png');
+            game.load.image('sona_heartbroken', 'assets/sona/heart_broken.png');
+
+            //sona difficulty
+            game.load.spritesheet('sona_difficulty_button_easy', 'assets/sona_difficulty_button_easy.png', 200, 60);
+            game.load.spritesheet('sona_difficulty_button_medium', 'assets/sona_difficulty_button_medium.png', 200, 60);
+            game.load.spritesheet('sona_difficulty_button_hard', 'assets/sona_difficulty_button_hard.png', 200, 60);
+            game.load.spritesheet('sona_difficulty_button_hardcore', 'assets/sona_difficulty_button_hardcore.png', 200, 60);
         },
         create: function() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -568,18 +681,15 @@ window.onload = function() {
             var firstbuttonX = (game.width - (186+10)*3)/2;
             var buttonY = game.height-78;
 
-            var hecarimbutton = game.add.button(firstbuttonX, buttonY, 'heca_button', function() {
+            var sonabutton = game.add.button(firstbuttonX, buttonY, 'sona_button', function() {
+                game.state.start('game_sona_difficulty');
+            }, this, 1, 0, 2, 0);
+            var hecarimbutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'heca_button', function() {
                 game.state.start('game_hecarim');
             }, this, 1, 0, 2, 0);
-            //hecarimbutton.anchor.set(0.5);
-            var missfortunebutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'mf_button', function() {
+            var missfortunebutton = game.add.button(firstbuttonX + (186 + 10)*2, buttonY, 'mf_button', function() {
                 game.state.start('game_missfortune');
             }, this, 1, 0, 2, 0);
-            //missfortunebutton.anchor.set(0.5);
-            var sonabutton = game.add.button(firstbuttonX + (186 + 10)*2, buttonY, 'sona_button', function() {
-                game.state.start('game_sona');
-            }, this, 1, 0, 2, 0);
-            //sonabutton.anchor.set(0.5);
 
             buttons.add(hecarimbutton);
             buttons.add(missfortunebutton);
@@ -608,11 +718,12 @@ window.onload = function() {
         create: function() {
             game.state.start('mainmenu');
         }
-    }
+    };
 
     game.state.add('game_hecarim', HecarimGame);
     game.state.add('game_missfortune', MissFortuneGame);
     game.state.add('game_sona', SonaGame);
+    game.state.add('game_sona_difficulty', SonaDifficultySelect);
     game.state.add('mainmenu', MainMenu);
     game.state.add('boot', Boot);
 
