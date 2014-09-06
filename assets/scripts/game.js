@@ -1,5 +1,5 @@
 window.onload = function() {
-    var game = new Phaser.Game(1024, 576, Phaser.CANVAS, 'game');
+    var game = new Phaser.Game(1024, 576, Phaser.WEBGL, 'game');
 
     var HecarimGame = {
         gameover: false,
@@ -184,7 +184,7 @@ window.onload = function() {
             this.menubutton.scale.set(0.5);
             var text = game.add.text(game.width/2, game.height/2, "Soon™", { font: "65px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
-        },
+        }
     };
     var MissFortuneGame = {
         create: function() {
@@ -271,6 +271,11 @@ window.onload = function() {
                     this.fourButtonChance = 100;
                     break;
             }
+
+            //music
+            this.sound1 = game.add.audio('sound4', 0.5, false);
+            this.sound1.play();
+
             //button params
             this.buttonSize = 100;
             this.buttonSpacing = 10;
@@ -374,6 +379,7 @@ window.onload = function() {
             //add global controls
             this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
                 window.onblur = null;
+                game.sound.stopAll();
                 game.state.start('mainmenu');
             }, this, 1, 0, 2, 0);
             this.menubutton.scale.set(0.5);
@@ -383,6 +389,16 @@ window.onload = function() {
             this.pausebutton.input.useHandCursor = true;
             this.pausebutton.events.onInputDown.add(function() {
                 this.pause();
+            }, this);
+            this.mutebutton = game.add.text(game.width-150, 0, "Mute Music", { font: "24px Arial", fill: "#ffffff"});
+            this.mutebutton.inputEnabled = true;
+            this.mutebutton.input.useHandCursor = true;
+            this.mutebutton.events.onInputDown.add(function() {
+                if(game.sound.mute) {
+                    game.sound.mute = false;
+                } else {
+                    game.sound.mute = true;
+                }
             }, this);
 
             game.input.onDown.add(function() {
@@ -563,6 +579,7 @@ window.onload = function() {
         gameOverClick: function() {
             game.paused = false;
             window.onblur = null;
+            game.sound.stopAll();
             game.state.start('game_sona_difficulty');
         }
     };
@@ -641,6 +658,10 @@ window.onload = function() {
         create: function() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
+            //add music
+            this.music = game.add.audio('mainmenumusic', 0.5, true);
+            this.music.play();
+
             //add background
             this.bg = game.add.sprite(0,0, 'bg');
             this.bg.scale.x = (game.width)/1280;
@@ -681,19 +702,34 @@ window.onload = function() {
             var firstbuttonX = (game.width - (186+10)*3)/2;
             var buttonY = game.height-78;
 
-            var sonabutton = game.add.button(firstbuttonX, buttonY, 'sona_button', function() {
+            var sonabutton = game.add.button(firstbuttonX+186, buttonY, 'sona_button', function() {
+                MainMenu.music.stop();
                 game.state.start('game_sona_difficulty');
             }, this, 1, 0, 2, 0);
-            var hecarimbutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'heca_button', function() {
+            /*var hecarimbutton = game.add.button(firstbuttonX + 186 + 10, buttonY, 'heca_button', function() {
+                MainMenu.music.stop();
                 game.state.start('game_hecarim');
             }, this, 1, 0, 2, 0);
             var missfortunebutton = game.add.button(firstbuttonX + (186 + 10)*2, buttonY, 'mf_button', function() {
+                MainMenu.music.stop();
                 game.state.start('game_missfortune');
-            }, this, 1, 0, 2, 0);
+            }, this, 1, 0, 2, 0);*/
 
-            buttons.add(hecarimbutton);
-            buttons.add(missfortunebutton);
+            /*buttons.add(hecarimbutton);
+            buttons.add(missfortunebutton);*/
             buttons.add(sonabutton);
+
+
+            this.mutebutton = game.add.text(game.width-150, 0, "Mute Music", { font: "24px Arial", fill: "#ffffff"});
+            this.mutebutton.inputEnabled = true;
+            this.mutebutton.input.useHandCursor = true;
+            this.mutebutton.events.onInputDown.add(function() {
+                if(game.sound.mute) {
+                    game.sound.mute = false;
+                } else {
+                    game.sound.mute = true;
+                }
+            }, this);
         },
         update: function() {
             //cloud respawn
@@ -714,9 +750,21 @@ window.onload = function() {
     var Boot = {
         preload: function() {
             game.load.image('loadingbar', 'assets/loadingbar.png');
+
+            game.load.audio('mainmenumusic', 'assets/sound/sound1.mp3');
+            //game.load.audio('sound2', 'assets/sound/sound2.mp3');
+            //game.load.audio('sound3', 'assets/sound/sound3.mp3');
+            game.load.audio('sound4', 'assets/sound/sound4.mp3');
         },
         create: function() {
-            game.state.start('mainmenu');
+            var text = game.add.text(game.width/2, game.height/2, "Decoding audio\nThis may take a while...", { font: "48px Arial", fill: "#ffffff", align: "center" });
+            text.anchor.set(0.5);
+        },
+        update: function() {
+            if (this.cache.isSoundDecoded('mainmenumusic') && this.cache.isSoundDecoded('sound4'))
+            {
+                game.state.start('mainmenu');
+            }
         }
     };
 
