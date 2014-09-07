@@ -384,22 +384,16 @@ window.onload = function() {
             }, this, 1, 0, 2, 0);
             this.menubutton.scale.set(0.5);
 
-            this.pausebutton = game.add.text(game.width-24, 0, "||", { font: "24px Arial", fill: "#ffffff"});
-            this.pausebutton.inputEnabled = true;
-            this.pausebutton.input.useHandCursor = true;
-            this.pausebutton.events.onInputDown.add(function() {
+            this.mutebutton = game.add.button(game.width-45, 5, "pause_button", function() {
                 this.pause();
-            }, this);
-            this.mutebutton = game.add.text(game.width-150, 0, "Mute Music", { font: "24px Arial", fill: "#ffffff"});
-            this.mutebutton.inputEnabled = true;
-            this.mutebutton.input.useHandCursor = true;
-            this.mutebutton.events.onInputDown.add(function() {
+            }, this, 1, 0, 2, 0);
+            this.mutebutton = game.add.button(game.width-85, 5, "mute_button", function() {
                 if(game.sound.mute) {
                     game.sound.mute = false;
                 } else {
                     game.sound.mute = true;
                 }
-            }, this);
+            }, this, 1, 0, 2, 0);
 
             game.input.onDown.add(function() {
                 if(game.paused && !SonaGame.gameover) {
@@ -586,7 +580,9 @@ window.onload = function() {
     var SonaDifficultySelect = {
         create: function() {
             this.bg = game.add.sprite(0,0, 'sona_bg');
-            this.text = game.add.text(game.world.centerX, game.world.height/6, 'Select difficulty:', {font: "24px Arial", fill:'#FFFFFF'});
+            /*this.text = game.add.text(game.world.centerX, game.world.height/6, 'Select difficulty:', {font: "24px Arial", fill:'#FFFFFF'});
+            this.text.anchor.set(0.5);*/
+            this.text = game.add.sprite(game.world.centerX, game.world.height/6, 'sona_difficulty_text');
             this.text.anchor.set(0.5);
 
             this.menubutton = game.add.button(5, 5, 'sona_mainmenubutton', function() {
@@ -616,10 +612,9 @@ window.onload = function() {
     };
     var MainMenu = {
         preload: function() {
-            this.loadtext = game.add.text(game.world.centerX, game.world.centerY-45, 'Loading', {font: '24px Arial', fill: '#FFF'});
+            this.loadtext = game.add.sprite(game.world.centerX, game.world.centerY-45, 'loadingtext');
             this.loadtext.anchor.set(0.5);
-            this.loadsprite = game.add.sprite(game.world.centerX, game.world.centerY, 'loadingbar');
-            this.loadsprite.anchor.set(0.5);
+            this.loadsprite = game.add.sprite(game.world.centerX-200, game.world.centerY, 'loadingbar');
             game.load.setPreloadSprite(this.loadsprite);
 
             game.load.image('bg', 'assets/mainmenu/background_full.png');
@@ -632,6 +627,9 @@ window.onload = function() {
             game.load.spritesheet('sona', 'assets/mainmenu/sona_idle.png', 211, 188, 9);
             game.load.spritesheet('hecarim', 'assets/mainmenu/hecarim_idle.png', 211, 188, 4);
             game.load.spritesheet('missfortune', 'assets/mainmenu/miss_fortune_idle.png', 211, 188, 20);
+            game.load.spritesheet('mute_button_muted', 'assets/mute_button_muted.png', 40, 40);
+            game.load.spritesheet('mute_button_unmuted', 'assets/mute_button_unmuted.png', 40, 40);
+            game.load.spritesheet('pause_button', 'assets/pause_button.png', 40, 40);
 
             //sona
             game.load.spritesheet('sona_button_q', 'assets/sona/button_q.png', 100, 100, 2);
@@ -654,12 +652,13 @@ window.onload = function() {
             game.load.spritesheet('sona_difficulty_button_medium', 'assets/sona_difficulty_button_medium.png', 200, 60);
             game.load.spritesheet('sona_difficulty_button_hard', 'assets/sona_difficulty_button_hard.png', 200, 60);
             game.load.spritesheet('sona_difficulty_button_hardcore', 'assets/sona_difficulty_button_hardcore.png', 200, 60);
+            game.load.image('sona_difficulty_text', 'assets/difficulty_select_text.png');
         },
         create: function() {
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
             //add music
-            this.music = game.add.audio('mainmenumusic', 0.5, true);
+            this.music = game.add.audio('mainmenumusic', 0.2, true);
             this.music.play();
 
             //add background
@@ -720,16 +719,15 @@ window.onload = function() {
             buttons.add(sonabutton);
 
 
-            this.mutebutton = game.add.text(game.width-150, 0, "Mute Music", { font: "24px Arial", fill: "#ffffff"});
-            this.mutebutton.inputEnabled = true;
-            this.mutebutton.input.useHandCursor = true;
-            this.mutebutton.events.onInputDown.add(function() {
+            this.mutebutton = game.add.button(game.width-45, 5, "mute_button_unmuted", function() {
                 if(game.sound.mute) {
                     game.sound.mute = false;
+                    MainMenu.mutebutton.loadTexture('mute_button_unmuted', 0);
                 } else {
                     game.sound.mute = true;
+                    MainMenu.mutebutton.loadTexture('mute_button_muted', 0);
                 }
-            }, this);
+            }, this, 1, 0, 2, 0);
         },
         update: function() {
             //cloud respawn
@@ -749,7 +747,9 @@ window.onload = function() {
     };
     var Boot = {
         preload: function() {
+            game.load.image('decodingtext', 'assets/decoding_audio_text.png');
             game.load.image('loadingbar', 'assets/loadingbar.png');
+            game.load.image('loadingtext', 'assets/loadingtext.png');
 
             game.load.audio('mainmenumusic', 'assets/sound/sound1.ogg');
             //game.load.audio('sound2', 'assets/sound/sound2.mp3');
@@ -757,7 +757,7 @@ window.onload = function() {
             game.load.audio('sound4', 'assets/sound/sound4.ogg');
         },
         create: function() {
-            var text = game.add.text(game.width/2, game.height/2, "Decoding audio\nPlease wait...", { font: "48px Arial", fill: "#ffffff", align: "center" });
+            var text = game.add.sprite(game.width/2, game.height/2, "decodingtext");
             text.anchor.set(0.5);
         },
         update: function() {
