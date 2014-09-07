@@ -384,14 +384,16 @@ window.onload = function() {
             }, this, 1, 0, 2, 0);
             this.menubutton.scale.set(0.5);
 
-            this.mutebutton = game.add.button(game.width-45, 5, "pause_button", function() {
+            this.pausebutton = game.add.button(game.width-45, 5, "pause_button", function() {
                 this.pause();
             }, this, 1, 0, 2, 0);
-            this.mutebutton = game.add.button(game.width-85, 5, "mute_button", function() {
+            this.mutebutton = game.add.button(game.width-85, 5, "mute_button_unmuted", function() {
                 if(game.sound.mute) {
                     game.sound.mute = false;
+                    SonaGame.mutebutton.loadTexture('mute_button_unmuted', 0);
                 } else {
                     game.sound.mute = true;
+                    SonaGame.mutebutton.loadTexture('mute_button_muted', 0);
                 }
             }, this, 1, 0, 2, 0);
 
@@ -551,7 +553,7 @@ window.onload = function() {
             if(game.paused) {
                 this.pausetext.destroy();
                 game.paused = false;
-                this.nextButtonSpawn = this.pausetime - this.nextButtonSpawn + game.time.now;
+                this.nextButtonSpawn = this.nextButtonSpawn - this.pausetime + game.time.now;
             }
         },
         loseLife: function() {
