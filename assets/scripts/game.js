@@ -751,13 +751,13 @@ window.onload = function() {
         preload: function() {
             game.load.image('loadingbar', 'assets/loadingbar.png');
 
-            game.load.audio('mainmenumusic', 'assets/sound/sound1.mp3');
+            game.load.audio('mainmenumusic', 'assets/sound/sound1.ogg');
             //game.load.audio('sound2', 'assets/sound/sound2.mp3');
             //game.load.audio('sound3', 'assets/sound/sound3.mp3');
-            game.load.audio('sound4', 'assets/sound/sound4.mp3');
+            game.load.audio('sound4', 'assets/sound/sound4.ogg');
         },
         create: function() {
-            var text = game.add.text(game.width/2, game.height/2, "Decoding audio\nThis may take a while...", { font: "48px Arial", fill: "#ffffff", align: "center" });
+            var text = game.add.text(game.width/2, game.height/2, "Decoding audio\nPlease wait...", { font: "48px Arial", fill: "#ffffff", align: "center" });
             text.anchor.set(0.5);
         },
         update: function() {
